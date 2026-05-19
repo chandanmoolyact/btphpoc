@@ -1,0 +1,86 @@
+<core:FragmentDefinition
+	 xmlns="sap.ui.table"
+        xmlns:mvc="sap.ui.core.mvc"
+        xmlns:m="sap.m"
+        xmlns:u="sap.ui.unified"
+        xmlns:core="sap.ui.core">
+                <TreeTable
+                    id="TreeTableBasic"
+                    rows="{path:'excelModel>/data', parameters: {arrayNames:['children']}}"
+                    selectionMode="MultiToggle"
+                    enableSelectAll="false"
+                    ariaLabelledBy="title">
+                <extension>
+                    <m:OverflowToolbar style="Clear">
+                        <m:Title id="title" text="Purchase Order"/>
+                        <m:ToolbarSpacer/>
+                        <m:Button text="Collapse all" press="onCollapseAll"/>
+                        <m:Button text="Collapse selection" press="onCollapseSelection"/>
+                        <m:Button text="Expand first level" press="onExpandFirstLevel"/>
+                        <m:Button text="Expand selection" press="onExpandSelection"/>
+                    </m:OverflowToolbar>
+                </extension>
+                <columns>
+                    <Column width="13rem">
+                        <m:Label text="PO Number"/>
+                        <template>
+                            <m:Text text="{excelModel>PONumber}" wrapping="false" />
+                        </template>
+                    </Column>
+                    <Column width="9rem">
+                        <m:Label text="Vendor"/>
+                        <template>
+                            <m:Text text="{excelModel>VendorCode}" wrapping="false" />
+                        </template>
+                    </Column>
+                    <Column width="11rem">
+                        <m:Label text="Vendor Description"/>
+                        <template>
+                            <m:Text text="{excelModel>VendorName}" wrapping="false" />
+                        </template>
+                    </Column>
+                    <Column width="13rem">
+                        <m:Label text="Document Date"/>
+                        <template>
+                            <m:Text text="{excelModel>DocumentDate}" wrapping="false" />
+                        </template>
+                    </Column>
+                    <Column width="9rem">
+                        <m:Label text="Item No."/>
+                        <template>
+                            <m:Text text="{excelModel>LineItemNumber}" wrapping="false" />
+                        </template>
+                    </Column>
+                    <Column width="11rem">
+                        <m:Label text="Material"/>
+                        <template>
+                            <m:Text text="{excelModel>Material}" wrapping="false" />
+                        </template>
+                    </Column>
+                    <Column width="13rem">
+                        <m:Label text="Delivery Date"/>
+                        <template>
+                            <m:Text text="{excelModel>DeliveryDate}" wrapping="false" />
+                        </template>
+                    </Column>
+                    <Column width="9rem">
+                        <m:Label text="Quantity"/>
+                        <template>
+                            <m:Text text="{excelModel>Quantity}" wrapping="false" />
+                        </template>
+                    </Column>
+                    <Column width="11rem">
+                        <m:Label text="Delivery Date"/>
+                        <template>
+                            <m:Text text="{excelModel>DeliveryDate}" wrapping="false" />
+                        </template>
+                    </Column>
+                    <Column width="13rem">
+                        <m:Label text="Action"/>
+                        <template>
+                            <m:Button icon="sap-icon://delete" type="Reject" press=".onDeleteVendorRow" />
+                        </template>
+                    </Column>
+                </columns>
+            </TreeTable>
+</core:FragmentDefinition>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/Common.xml">
+        <edmx:Include Alias="Common" Namespace="com.sap.vocabularies.Common.v1"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="https://oasis-tcs.github.io/odata-vocabularies/vocabularies/Org.OData.Core.V1.xml">
+        <edmx:Include Alias="Core" Namespace="Org.OData.Core.V1"/>
+    </edmx:Reference>
+    <edmx:DataServices>
+        <Schema Namespace="Stateless" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotation Term="Core.Links">
+                <Collection>
+                    <Record>
+                        <PropertyValue Property="rel" String="author"/>
+                        <PropertyValue Property="href" String="https://cap.cloud.sap"/>
+                    </Record>
+                </Collection>
+            </Annotation>
+            <EntityContainer Name="EntityContainer">
+                <FunctionImport Name="showMessage" Function="Stateless.showMessage"/>
+                <FunctionImport Name="sendMailContent" Function="Stateless.sendMailContent"/>
+            </EntityContainer>
+            <ComplexType Name="POConfirmation">
+                <Property Name="PONumber" Type="Edm.String"/>
+                <Property Name="VendorCode" Type="Edm.String"/>
+                <Property Name="VendorName" Type="Edm.String"/>
+                <Property Name="PODate" Type="Edm.String"/>
+                <Property Name="POLineItem" Type="Edm.String"/>
+                <Property Name="LineItemNumber" Type="Edm.String"/>
+                <Property Name="SequenceNumber" Type="Edm.String"/>
+                <Property Name="DeliveryDate" Type="Edm.String"/>
+                <Property Name="ConfirmationCategory" Type="Edm.String"/>
+                <Property Name="Quantity" Type="Edm.String"/>
+                <Property Name="Reference" Type="Edm.String"/>
+                <Property Name="CreationDate" Type="Edm.String"/>
+                <Property Name="InboundDelivery" Type="Edm.String"/>
+                <Property Name="Item" Type="Edm.String"/>
+                <Property Name="Batch" Type="Edm.String"/>
+                <Property Name="QtyReduced" Type="Edm.String"/>
+                <Property Name="MRPRelevant" Type="Edm.String"/>
+                <Property Name="MRPMaterial" Type="Edm.String"/>
+                <Property Name="CreationIndicator" Type="Edm.String"/>
+                <Property Name="Status" Type="Edm.Int32"/>
+                <Property Name="newRecFlag" Type="Edm.Boolean"/>
+                <Property Name="StatusState" Type="Edm.String"/>
+                <Property Name="StatusMsg" Type="Edm.String"/>
+                <Property Name="RejectFlag" Type="Edm.String"/>
+                <Property Name="RejectReason" Type="Edm.String"/>
+                <Property Name="RejectDate" Type="Edm.String"/>
+            </ComplexType>
+            <ComplexType Name="POLineItem">
+                <Property Name="PONumber" Type="Edm.String"/>
+                <Property Name="VendorCode" Type="Edm.String"/>
+                <Property Name="VendorName" Type="Edm.String"/>
+                <Property Name="PODate" Type="Edm.String"/>
+                <Property Name="POLineItem" Type="Edm.String"/>
+                <Property Name="LineItemNumber" Type="Edm.String"/>
+                <Property Name="Material" Type="Edm.String"/>
+                <Property Name="MaterialDesc" Type="Edm.String"/>
+                <Property Name="POQuantity" Type="Edm.String"/>
+                <Property Name="UOM" Type="Edm.String"/>
+                <Property Name="NetPrice" Type="Edm.String"/>
+                <Property Name="Currency" Type="Edm.String"/>
+                <Property Name="Per" Type="Edm.String"/>
+                <Property Name="MaterialGroup" Type="Edm.String"/>
+                <Property Name="Plant" Type="Edm.String"/>
+                <Property Name="StorageLocation" Type="Edm.String"/>
+                <Property Name="NextPanelVisible" Type="Edm.Boolean"/>
+                <Property Name="DeliveryDate" Type="Edm.String"/>
+                <Property Name="children" Type="Collection(Stateless.POConfirmation)" Nullable="true"/>
+            </ComplexType>
+            <ComplexType Name="POHeader">
+                <Property Name="PONumber" Type="Edm.String"/>
+                <Property Name="VendorCode" Type="Edm.String"/>
+                <Property Name="VendorName" Type="Edm.String"/>
+                <Property Name="PODate" Type="Edm.String"/>
+                <Property Name="PanelVisible" Type="Edm.Boolean"/>
+                <Property Name="children" Type="Collection(Stateless.POLineItem)" Nullable="true"/>
+            </ComplexType>
+            <Function Name="showMessage" IsBound="false" IsComposable="false">
+                <ReturnType Type="Collection(Edm.String)" Nullable="true"/>
+            </Function>
+            <Function Name="sendMailContent" IsBound="false" IsComposable="false">
+                <Parameter Name="poHeader" Type="Collection(Stateless.POHeader)" Nullable="true"/>
+                <ReturnType Type="Collection(Edm.String)" Nullable="true"/>
+            </Function>
+            <Annotations Target="Stateless.sendMailContent(Collection(Stateless.POHeader))/poHeader">
+                <Annotation Term="Core.OptionalParameter">
+                    <Record Type="Core.OptionalParameterType"/>
+                </Annotation>
+            </Annotations>
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>

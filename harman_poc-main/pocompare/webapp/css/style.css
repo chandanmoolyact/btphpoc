@@ -1,0 +1,456 @@
+/* ═══════════════════════════════════════════════════════════
+   PO Compare — UI Refresh v4
+   ═══════════════════════════════════════════════════════════ */
+
+/* ──────────────────────────────────────────────────────────
+   PAGE SHELL — subtle gradient background
+   ────────────────────────────────────────────────────────── */
+.sapMPage > .sapMPageBg,
+.sapFDynamicPage {
+    background: #f0f3f8 !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   TOP TITLE BAR
+   ────────────────────────────────────────────────────────── */
+.sapFDynamicPageTitleMainHeadingInner .sapMTitle {
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    color: #1a3c6e !important;
+    letter-spacing: -0.01em !important;
+}
+
+/* ── Save Button — deep navy fill ── */
+.poSaveBtn.sapMBtn .sapMBtnInner {
+    background: #1a3c6e !important;
+    border-color: #1a3c6e !important;
+    color: #ffffff !important;
+    border-radius: 6px !important;
+    font-size: 0.78rem !important;
+    font-weight: 600 !important;
+    padding: 0 1rem !important;
+    box-shadow: 0 2px 6px rgba(26, 60, 110, 0.30) !important;
+    transition: background 0.15s ease, box-shadow 0.15s ease !important;
+}
+.poSaveBtn.sapMBtn .sapMBtnInner:hover {
+    background: #12285a !important;
+    box-shadow: 0 4px 10px rgba(26, 60, 110, 0.40) !important;
+}
+.poSaveBtn.sapMBtn .sapMBtnIcon {
+    color: #ffffff !important;
+}
+
+/* ── Clear Button — outlined periwinkle ── */
+.poClearBtn.sapMBtn .sapMBtnInner {
+    background: #ffffff !important;
+    border: 1.5px solid #3949ab !important;
+    color: #3949ab !important;
+    border-radius: 6px !important;
+    font-size: 0.78rem !important;
+    font-weight: 600 !important;
+    padding: 0 1rem !important;
+    transition: background 0.15s ease, color 0.15s ease !important;
+}
+.poClearBtn.sapMBtn .sapMBtnInner:hover {
+    background: #eef0fc !important;
+    color: #1a237e !important;
+    border-color: #1a237e !important;
+}
+.poClearBtn.sapMBtn .sapMBtnIcon {
+    color: #3949ab !important;
+}
+
+/* ── Help Icon Button ── */
+.poHelpBtn.sapMBtn .sapMBtnInner {
+    color: #3949ab !important;
+    border-color: transparent !important;
+    border-radius: 50% !important;
+}
+.poHelpBtn.sapMBtn .sapMBtnInner:hover {
+    background: #eef0fc !important;
+    color: #1a237e !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   UPLOAD STRIP (snapped + header)
+   ────────────────────────────────────────────────────────── */
+.poUploadPanel {
+    margin: 0.5rem 1rem 0 1rem !important;
+    border: 1px solid #c9daf0 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 6px rgba(26, 60, 110, 0.07) !important;
+    background: #ffffff !important;
+    overflow: hidden !important;
+}
+.poUploadPanel .sapMTB,
+.poUploadPanel .sapMPanelHdr {
+    background: linear-gradient(90deg, #eef3fb 0%, #f5f8fd 100%) !important;
+    border-bottom: 1px solid #c9daf0 !important;
+    min-height: 2.2rem !important;
+    padding: 0 0.875rem !important;
+}
+.poUploadPanel .sapMTitle {
+    color: #1a3c6e !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+}
+.poUploadPanel .sapMPanelExpandablePart,
+.poUploadPanel .sapMPanelContent {
+    padding: 0.6rem 0.875rem 0.7rem !important;
+    background: #ffffff !important;
+}
+.poUploadPanel .sapMLabel {
+    color: #5b7a9e !important;
+    font-size: 0.75rem !important;
+}
+
+/* File-uploader pill styling */
+.poUploadPanel .sapUiUfdUpl .sapUiUfdUplBrowse .sapMBtnInner {
+    border-radius: 6px 0 0 6px !important;
+    background: #1a3c6e !important;
+    color: #fff !important;
+    border-color: #1a3c6e !important;
+    font-size: 0.75rem !important;
+}
+.poUploadPanel .sapUiUfdUplFileName {
+    border-radius: 0 6px 6px 0 !important;
+    border-color: #c9daf0 !important;
+    font-size: 0.75rem !important;
+    background: #f8fafd !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   CONTENT CARD WRAPPER
+   ────────────────────────────────────────────────────────── */
+.sapFDynamicPageContent {
+    padding: 0.75rem 1rem !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   LEVEL 1 — PO HEADER TABLE   (cool-white / periwinkle)
+   ────────────────────────────────────────────────────────── */
+.poHeaderTable,
+.poHeaderTable.sapMList,
+.poHeaderTable .sapMListTbl,
+.poHeaderTable .sapMListItems,
+.poHeaderTable tbody,
+.poHeaderTable .sapMListTblBody {
+    background: #f4f5fb !important;
+}
+.poHeaderTable.sapMList {
+    border: 1px solid #d0d8f0 !important;
+    border-radius: 10px !important;
+    box-shadow: 0 2px 8px rgba(26, 60, 110, 0.07) !important;
+}
+.poHeaderTable .sapMTB {
+    background: #f0f3fb !important;
+    border-bottom: 1px solid #d0d8f0 !important;
+    border-radius: 10px 10px 0 0 !important;
+    padding: 0 0.75rem !important;
+    min-height: 2.25rem !important;
+}
+.poHeaderTable .sapMTB .sapMTitle {
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
+    color: #1a3c6e !important;
+}
+.poHeaderTable .sapMListTblHeaderCell {
+    background: #e4e9f8 !important;
+    color: #1a3c6e !important;
+    font-size: 0.68rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.04em !important;
+    text-transform: uppercase !important;
+    padding: 0.38rem 0.5rem !important;
+    border-right: 1px solid #cdd4ee !important;
+    border-bottom: 2px solid #a3b0e0 !important;
+    white-space: nowrap !important;
+}
+.poHeaderTable .sapMListTblRow {
+    background: #ffffff !important;
+    transition: background 0.12s ease !important;
+}
+.poHeaderTable .sapMListTblRow:nth-child(even) {
+    background: #f7f8fe !important;
+}
+.poHeaderTable .sapMLIBHoverable:hover {
+    background: #eaedfa !important;
+}
+.poHeaderTable .sapMListTblCell {
+    font-size: 0.68rem !important;
+    padding: 0.32rem 0.5rem !important;
+    vertical-align: middle !important;
+    white-space: nowrap !important;
+    color: #283878 !important;
+    border-right: 1px solid #eef0f8 !important;
+    border-bottom: 1px solid #f0f2fa !important;
+}
+/* PO Number bold */
+.poHeaderTable .sapMObjectIdentifierTitle {
+    font-weight: 700 !important;
+    font-size: 0.72rem !important;
+    color: #1a3c6e !important;
+}
+/* Left accent bar on expanded rows */
+.poHeaderTable .sapMLIBSelected,
+.poHeaderTable .sapMLIBActive {
+    border-left: 3px solid #3949ab !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   LEVEL 2 — PO LINE ITEMS   (mint / teal)
+   ────────────────────────────────────────────────────────── */
+.poLinesTable {
+    margin: 0.3rem 0.5rem 0.4rem 0.25rem !important;
+    border: 1px solid #a8d8d4 !important;
+    border-radius: 8px !important;
+    overflow: visible !important;
+    box-shadow: 0 1px 5px rgba(0, 105, 92, 0.08) !important;
+    background: #ffffff !important;
+}
+.poLinesTable .sapMListTbl {
+    background: #ffffff !important;
+}
+.poLinesTable .sapMTB {
+    background: #e6f5f4 !important;
+    border-bottom: 1px solid #a8d8d4 !important;
+    min-height: 2rem !important;
+    padding: 0 0.75rem !important;
+}
+.poLinesTable .sapMTB .sapMTitle {
+    font-size: 0.78rem !important;
+    font-weight: 700 !important;
+    color: #00574f !important;
+}
+.poLinesTable .sapMListTblHeaderCell {
+    background: #c5e8e5 !important;
+    color: #00574f !important;
+    font-size: 0.65rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.03em !important;
+    text-transform: uppercase !important;
+    padding: 0.32rem 0.45rem !important;
+    white-space: nowrap !important;
+    border-right: 1px solid #9fd4d0 !important;
+    border-bottom: 2px solid #6dbfb9 !important;
+}
+.poLinesTable .sapMListTblRow {
+    background: #ffffff !important;
+    transition: background 0.12s ease !important;
+}
+.poLinesTable .sapMListTblRow:nth-child(even) {
+    background: #f3fbfa !important;
+}
+.poLinesTable .sapMLIBHoverable:hover {
+    background: #dff3f1 !important;
+}
+.poLinesTable .sapMListTblCell {
+    font-size: 0.66rem !important;
+    padding: 0.25rem 0.4rem !important;
+    vertical-align: middle !important;
+    white-space: nowrap !important;
+    color: #004d45 !important;
+    border-right: 1px solid #eaf6f5 !important;
+    border-bottom: 1px solid #f0faf9 !important;
+}
+.poLinesTable .sapMLIBSelected,
+.poLinesTable .sapMLIBActive {
+    border-left: 3px solid #00796b !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   LEVEL 3 — CONFIRMATION LINES   (warm cream / amber)
+   ────────────────────────────────────────────────────────── */
+.poConfTable {
+    margin: 0.3rem 0.5rem 0.4rem 0.25rem !important;
+    border: 1px solid #f5d78a !important;
+    border-radius: 8px !important;
+    overflow: visible !important;
+    box-shadow: 0 1px 5px rgba(180, 120, 0, 0.08) !important;
+    background: #ffffff !important;
+}
+.poConfTable .sapMTB,
+.poConfTable .sapMTBActive {
+    background: #fef8e7 !important;
+    border-bottom: 1px solid #f5d78a !important;
+    min-height: 2rem !important;
+    padding: 0 0.75rem !important;
+}
+.poConfTable .sapMTB .sapMTitle {
+    font-size: 0.78rem !important;
+    font-weight: 700 !important;
+    color: #7a4f00 !important;
+}
+.poConfTable .sapMListTblHeaderCell {
+    background: #fdedb3 !important;
+    color: #7a4f00 !important;
+    font-size: 0.64rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.03em !important;
+    padding: 0.3rem 0.4rem !important;
+    white-space: nowrap !important;
+    border-right: 1px solid #f5d78a !important;
+    border-bottom: 2px solid #f0c040 !important;
+}
+.poConfTable .sapMListTblRow {
+    background: #ffffff !important;
+    transition: background 0.12s ease !important;
+}
+.poConfTable .sapMListTblRow:nth-child(even) {
+    background: #fffcf0 !important;
+}
+.poConfTable .sapMLIBHoverable:hover {
+    background: #fef4cc !important;
+}
+.poConfTable .sapMListTblRow .sapMListTblCell {
+    font-size: 0.64rem !important;
+    padding: 0.22rem 0.35rem !important;
+    vertical-align: middle !important;
+    white-space: nowrap !important;
+    color: #6b4400 !important;
+    border-right: 1px solid #fef3d0 !important;
+    border-bottom: 1px solid #fef8e7 !important;
+}
+.poConfTable .sapMLIBSelected,
+.poConfTable .sapMLIBActive {
+    border-left: 3px solid #f0a000 !important;
+}
+
+/* Compact editable inputs in L3 */
+.poConfTable .sapMInput,
+.poConfTable .sapMDP {
+    height: 1.65rem !important;
+    min-width: 4.5rem !important;
+}
+.poConfTable .sapMInputBase {
+    border-radius: 4px !important;
+    border-color: #e8c96a !important;
+}
+.poConfTable .sapMInputBase:focus-within {
+    border-color: #f0a000 !important;
+    box-shadow: 0 0 0 2px rgba(240, 160, 0, 0.15) !important;
+}
+.poConfTable .sapMInputBaseInner {
+    font-size: 0.64rem !important;
+    padding: 0 0.3rem !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   ACTION BUTTONS — Delete / Reject / Remarks
+   ────────────────────────────────────────────────────────── */
+.poActionBtn.sapMBtn {
+    min-width: 0 !important;
+    height: 1.65rem !important;
+    padding: 0 !important;
+    margin: 0 2px !important;
+    border-radius: 5px !important;
+}
+.poActionBtn .sapMBtnInner {
+    height: 1.65rem !important;
+    padding: 0 0.4rem !important;
+    border-radius: 5px !important;
+    font-size: 0.68rem !important;
+    gap: 3px !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.10) !important;
+}
+.poActionBtn .sapMBtnIcon {
+    font-size: 0.75rem !important;
+    line-height: 1.65rem !important;
+}
+.poActionBtn .sapMBtnContent {
+    font-size: 0.68rem !important;
+    line-height: 1.65rem !important;
+    font-weight: 600 !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   OBJECT STATUS BADGES
+   ────────────────────────────────────────────────────────── */
+.sapMObjStatus {
+    border-radius: 10px !important;
+    padding: 1px 6px !important;
+}
+.sapMObjStatusText {
+    font-size: 0.68rem !important;
+    font-weight: 600 !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   EXPAND / COLLAPSE CHEVRON CELLS
+   ────────────────────────────────────────────────────────── */
+.sapMListTblCell:first-child .sapUiIcon {
+    transition: transform 0.18s ease !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   FOOTER TOOLBAR
+   ────────────────────────────────────────────────────────── */
+.sapFDynamicPageActualFooterControl .sapMTB {
+    background: #ffffff !important;
+    border-top: 1px solid #d8dff0 !important;
+    box-shadow: 0 -2px 8px rgba(26, 60, 110, 0.06) !important;
+    padding: 0 1rem !important;
+}
+.sapFDynamicPageActualFooterControl .sapMBtn .sapMBtnInner {
+    border-radius: 6px !important;
+    font-size: 0.78rem !important;
+    font-weight: 600 !important;
+    padding: 0 1rem !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   PANELS — strip default chrome inside accordion rows
+   ────────────────────────────────────────────────────────── */
+.sapMPanel.sapMPanelBorderDesignBoxed {
+    border: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+}
+.sapUiTinyMarginTop.customPanelBorder {
+    margin-top: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   L3 SCROLL — handled by JS _patchL3ScrollDom via data-scrollid
+   ────────────────────────────────────────────────────────── */
+
+/* ──────────────────────────────────────────────────────────
+   MISC
+   ────────────────────────────────────────────────────────── */
+.sapUiSizeCompact .sapMListTblCell { height: 1.9rem !important; }
+
+/* Search field */
+.poHeaderTable .sapMSF {
+    border-radius: 6px !important;
+    border-color: #c0cae8 !important;
+}
+.poHeaderTable .sapMSF:focus-within {
+    border-color: #3949ab !important;
+    box-shadow: 0 0 0 2px rgba(57, 73, 171, 0.12) !important;
+}
+
+/* Depth indicator: left border colour on nested table containers */
+.poLinesTable  { border-left: 2px solid #6dbfb9 !important; }
+.poConfTable   { border-left: 2px solid #f0c040 !important; }
+
+/* Add Row button — slightly smaller than other action buttons */
+.poAddRowBtn.sapMBtn {
+    height: 1.4rem !important;
+    width: 1.4rem !important;
+    min-width: 1.4rem !important;
+    margin: 0 0.4rem 0 0 !important;
+}
+.poAddRowBtn.sapMBtn .sapMBtnInner {
+    height: 1.4rem !important;
+    min-width: 1.4rem !important;
+    padding: 0 0.25rem !important;
+    border-radius: 4px !important;
+}
+.poAddRowBtn.sapMBtn .sapMBtnIcon {
+    font-size: 0.68rem !important;
+    line-height: 1.4rem !important;
+}

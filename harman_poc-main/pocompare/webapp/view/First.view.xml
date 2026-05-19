@@ -1,0 +1,122 @@
+<mvc:View
+		controllerName="com.sap.pocompare.controller.First"
+		xmlns:mvc="sap.ui.core.mvc"
+		xmlns="sap.m"
+		xmlns:f="sap.f"
+		xmlns:layout="sap.ui.layout"
+		xmlns:core="sap.ui.core"
+		height="100%">
+
+	<f:DynamicPage
+		id="dynamicPageId"
+		headerExpanded="true"
+		toggleHeaderOnTitleClick="true"
+		fitContent="false"
+		preserveHeaderStateOnScroll="false">
+
+		<!-- ── Title bar ── -->
+		<f:title>
+			<f:DynamicPageTitle>
+				<f:heading>
+					<HBox alignItems="Center">
+						<core:Icon src="sap-icon://documents" size="1rem" color="#1a3c6e"
+							class="sapUiSmallMarginEnd"/>
+						<Title text="PO Excel Upload &amp; Compare" level="H4"/>
+					</HBox>
+				</f:heading>
+				<f:snappedContent>
+					<!-- Upload label shown when header is collapsed — click title to expand -->
+					<ObjectStatus
+						icon="sap-icon://upload-to-cloud"
+						text="Expand header to upload a file"
+						state="Information"/>
+				</f:snappedContent>
+				<f:actions>
+					<Button
+						text="Save"
+						icon="sap-icon://save"
+						type="Emphasized"
+						press=".onSaveTemplate"
+						tooltip="Save current PO comparison"
+						class="poSaveBtn"/>
+					<Button
+						text="Clear"
+						icon="sap-icon://reset"
+						type="Default"
+						press=".onCancelTemplate"
+						tooltip="Clear all data"
+						class="poClearBtn"/>
+				</f:actions>
+				<f:navigationActions>
+					<!-- <Button icon="sap-icon://hint" tooltip="Help" type="Transparent" class="poHelpBtn"/> -->
+				</f:navigationActions>
+			</f:DynamicPageTitle>
+		</f:title>
+
+		<!-- ── Expandable Header — upload area ── -->
+		<f:header>
+			<f:DynamicPageHeader pinnable="true">
+				<Panel
+					class="poUploadPanel"
+					expandable="false"
+					width="auto"
+					accessibleRole="Region">
+					<headerToolbar>
+						<OverflowToolbar>
+							<core:Icon src="sap-icon://upload-to-cloud" size="0.85rem"
+								color="#1a3c6e" class="sapUiTinyMarginEnd"/>
+							<Title text="Upload PO Excel File" level="H5"/>
+							<ToolbarSpacer/>
+							<Label text="Accepted formats: .xlsx, .xls" class="sapUiTinyMarginEnd"/>
+							<ObjectStatus
+								icon="sap-icon://information"
+								text="Click Browse to select a file"
+								state="Information"
+								inverted="false"/>
+						</OverflowToolbar>
+					</headerToolbar>
+					<content>
+						<core:Fragment
+							fragmentName="com.sap.pocompare.view.fragments.DynamicInput"
+							type="XML"/>
+					</content>
+				</Panel>
+			</f:DynamicPageHeader>
+		</f:header>
+
+		<!-- ── Main content ── -->
+		<f:content>
+			<core:Fragment
+				fragmentName="com.sap.pocompare.view.fragments.sections.PODynaTab"
+				type="XML"/>
+		</f:content>
+
+		<!-- ── Footer ── -->
+		<f:footer>
+			<OverflowToolbar>
+				<ObjectStatus
+					icon="sap-icon://record"
+					text="Ready"
+					state="Success"
+					class="sapUiSmallMarginBegin"/>
+				<ToolbarSpacer/>
+				<Button
+					type="Accept"
+					text="Accept All"
+					icon="sap-icon://accept"
+					tooltip="Accept all confirmation lines"/>
+				<Button
+					type="Reject"
+					text="Reject All"
+					icon="sap-icon://decline"
+					tooltip="Reject all confirmation lines"/>
+				<Button
+					type="Emphasized"
+					text="Submit"
+					icon="sap-icon://paper-plane"
+					tooltip="Submit to SAP"
+					class="sapUiSmallMarginBegin"/>
+			</OverflowToolbar>
+		</f:footer>
+	</f:DynamicPage>
+</mvc:View>

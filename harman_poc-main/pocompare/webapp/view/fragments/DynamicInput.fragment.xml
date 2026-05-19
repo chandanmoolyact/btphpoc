@@ -1,0 +1,18 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:u="sap.ui.unified"
+	xmlns:core="sap.ui.core">
+	<HBox class="poUploadRow sapUiSmallMarginBegin sapUiTinyMarginTop sapUiTinyMarginBottom" alignItems="Center">
+		<u:FileUploader
+			id="excelUploader"
+			name="excelUpload"
+			buttonText="Browse Excel"
+			icon="sap-icon://excel-attachment"
+			tooltip="Select your Excel file (.xlsx / .xls)"
+			fileType="xlsx,xls"
+			change="onFileChange"
+			style="Emphasized"
+			placeholder="Choose an Excel file (.xlsx, .xls)"
+			width="22rem"/>
+	</HBox>
+</core:FragmentDefinition>

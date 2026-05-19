@@ -1,0 +1,24 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <Popover
+        id="myQlikPopover"
+        title="Qlik Details"
+        class="sapUiContentPadding"
+        placement="Left"
+        initialFocus="idClose">
+        <footer>
+            <OverflowToolbar>
+                <ToolbarSpacer/>
+                <Button
+                    id="idQlikClose"
+                    text="Close"
+                    press=".onCloseQlikPopover" />
+            </OverflowToolbar>
+        </footer>
+        <VBox>
+            <Label text="Date : {excelModel>QlikDate} " design="Bold" wrapping="true" />
+            <Label text="Quantity : {excelModel>QlikQty} " design="Bold" wrapping="true" />
+        </VBox>
+    </Popover>
+</core:FragmentDefinition>
