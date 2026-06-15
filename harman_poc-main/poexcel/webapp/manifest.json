@@ -1,7 +1,7 @@
 {
   "_version": "1.83.0",
   "sap.app": {
-    "id": "com.sap.pocompare",
+    "id": "com.sap.poexcel",
     "type": "application",
     "i18n": "i18n/i18n.properties",
     "applicationVersion": {
@@ -28,11 +28,11 @@
     },
     "crossNavigation": {
       "inbounds": {
-        "pocompare-analyze": {
-          "semanticObject": "pocompare",
+        "poexcel-analyze": {
+          "semanticObject": "poexcel",
           "action": "analyze",
-          "title": "{{pocompare-analyze.flpTitle}}",
-          "subTitle": "{{pocompare-analyze.flpSubtitle}}",
+          "title": "{{poexcel-analyze.flpTitle}}",
+          "subTitle": "{{poexcel-analyze.flpSubtitle}}",
           "signature": {
             "parameters": {},
             "additionalParameters": "allowed"
@@ -74,7 +74,7 @@
       "i18n": {
         "type": "sap.ui.model.resource.ResourceModel",
         "settings": {
-          "bundleName": "com.sap.pocompare.i18n.i18n"
+          "bundleName": "com.sap.poexcel.i18n.i18n"
         }
       },
       "capService": {
@@ -111,9 +111,9 @@
         "transition": "slide",
         "type": "View",
         "viewType": "XML",
-        "path": "com.sap.pocompare.view",
+        "path": "com.sap.poexcel.view",
         "async": true,
-        "viewPath": "com.sap.pocompare.view"
+        "viewPath": "com.sap.poexcel.view"
       },
       "routes": [
         {
@@ -132,7 +132,7 @@
       }
     },
     "rootView": {
-      "viewName": "com.sap.pocompare.view.App",
+      "viewName": "com.sap.poexcel.view.App",
       "type": "XML",
       "id": "App",
       "async": true
@@ -140,6 +140,6 @@
   },
   "sap.cloud": {
     "public": true,
-    "service": "harmanpoc"
+    "service": "btphpoc"
   }
 }

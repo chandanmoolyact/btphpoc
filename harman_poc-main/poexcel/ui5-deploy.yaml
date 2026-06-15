@@ -2,7 +2,7 @@
 
 specVersion: "4.0"
 metadata:
-  name: com.sap.pocompare
+  name: com.sap.poexcel
 type: application
 resources:
   configuration:
@@ -16,7 +16,7 @@ builder:
     - name: ui5-task-zipper
       afterTask: generateCachebusterInfo
       configuration:
-        archiveName: comsappocompare
+        archiveName: comsappoexcel
         relativePaths: true
         additionalFiles:
           - xs-app.json

@@ -6,13 +6,13 @@ sap.ui.define([
     "sap/m/MessageToast",
     "sap/m/MessageBox",
     "sap/ui/export/Spreadsheet",
-    "com/sap/pocompare/model/formatter",
+    "com/sap/poexcel/model/formatter",
     "sap/ui/core/Fragment"
 ], (Controller,JSONModel,Filter,FilterOperator,MessageToast,MessageBox,Spreadsheet,formatter,Fragment) => {
     "use strict";
     var that;
 
-    return Controller.extend("com.sap.pocompare.controller.First", {
+    return Controller.extend("com.sap.poexcel.controller.First", {
         formattter:formatter,
         onInit() {
             that=this
@@ -27,10 +27,14 @@ sap.ui.define([
             
         },
         onAfterRendering: function () {
-            // this.oAdaptFilterBtn=sap.ui.getCore().byId("container-com.sap.pocompare---First--idTreeFilterBar-btnFilters-content")
+            // this.oAdaptFilterBtn=sap.ui.getCore().byId("container-com.sap.poexcel---First--idTreeFilterBar-btnFilters-content")
             // this.oAdaptFilterBtn.setVisible(false)
             this._injectL3ScrollStyles();
             this._patchL3ScrollDom();
+        },
+        onActionButtonPress: function (oEvent) {
+            var oButton = oEvent.getSource();
+			this.byId("actionSheet").openBy(oButton);
         },
 
         //Value Help Start
@@ -83,7 +87,7 @@ sap.ui.define([
             var oView = this.getView();
             
             // 1. Get the ID of the control that triggered the event
-            // e.g., "idMaterialCodeInput" or "container-pocompare---main--idMaterialCodeInput"
+            // e.g., "idMaterialCodeInput" or "container-poexcel---main--idMaterialCodeInput"
             var sSourceId = oEvent.getSource().getId();
             
             // 2. Extract the base field name (MaterialCode, PONumber, or VendorCode)
@@ -107,8 +111,8 @@ sap.ui.define([
             if (!this._mValueHelpDialogs[sFieldName]) {
                 this._mValueHelpDialogs[sFieldName] = Fragment.load({
                     id: oView.getId(),
-                    // Dynamically constructs: "com.sap.pocompare.view.fragments.valuehelp.MaterialCode" etc.
-                    name: "com.sap.pocompare.view.fragments.valuehelp." + sFieldName,
+                    // Dynamically constructs: "com.sap.poexcel.view.fragments.valuehelp.MaterialCode" etc.
+                    name: "com.sap.poexcel.view.fragments.valuehelp." + sFieldName,
                     controller: this
                 }).then(function (oValueHelpDialog) {
                     oView.addDependent(oValueHelpDialog);
@@ -592,29 +596,45 @@ sap.ui.define([
                     };
                     return {
                         //Level 1 Start
-                        VendorCode: row["Vendor Code"],
+                        VendorCode: row["Vendor Code"]||row["vendor code"],
+                        ODM:row["ODM"],
+                        FactorySite:row["Factory site"],
+                        Region:row["Region"],
+                        Project:row["Project"],
                         VendorName: row["Vendor Name"]||row["Vendor name"],
-                        PONumber: row["PO Number"] || row["PONumber"]||row["PO/PR No."],
-                        PODate: formatDate(row["PO date"]),
+                        PONumber: row["PO Number"] || row["PONumber"]||row["PO#"],
+                        PODate: formatDate(row["PO date"])||formatDate(row["Doc date"]),
                         PanelVisible:false,
                         //Level 2 Start
-                        // LineItem: row["Line Item"] || row["LineItem"],
+                        StatDelDate: row["Statistical delivery date"]||row["Statistical Delivery Date"],
+                        InitialDates: row["Initial dates:"]||row["Initial dates:"],
+                        ODMCRDMar19: row["ODM CRD Mar 19"]||row["ODM CRD Mar 19"],
+                        ODMRemark: row["ODM Remark"]||row["ODM Remark"],
+                        HarmanRemark: row["Harman Remark"]||row["Harman Remark"],
                         POLineItem: row["PO Line Item"] || row["LineItem"],
-                        Material: row["Material"],
+                        Material: row["Material"]||row["SKU"],
                         MaterialDesc: row["Material Description"],
-                        POQuantity: row["PO Quantity"],
+                        POQuantity: row["PO Qty"]||row["PO Quantity"],
                         UOM: row["Unit of Measure"],
-                        DeliveryDate: formatDate(row["Delivery Date"]),
-                        NetPrice: row["Net Price"],
-                        Currency: row["Currency"],
+                        DeliveryDate: formatDate(row["Delivery Date"]) ||formatDate(row["Harman request Jun 7th"]),
+                        NetPrice: row["Net Price"]||row["PO U/P"],
+                        Currency: row["Currency"]||row["Curr#"],
+                        Balance: row["Balance"],
                         Per: row["Per"],
                         MaterialGroup: row["Material Group"],
                         Plant : row["Plant"],
                         StorageLocation : row["Storage Location"],
                         //Level 3 Start
-                        ConfirmationCategory:row["Confirmation category"]||row["Confirmation Category"],
+                        ConfirmationCategory:row["Confirmation category"]||row["Order Status"],
+                        ShippingMode:row["Shipping mode"]||row["Shipping Mode"],
                         FDDCategory: row["Fdelivery Date category"] || row["FDelivery Date Category"] || row["Delivery Date Category"],
                         Quantity: row["Quantity"],
+                        Booking: row["Booking#"],
+                        ExFtCRD: row["Ex-factory/CRD"],
+                        RemarkCustomerAPAC: row["Remark/Customer APAC"],
+                        HarmanReqDate: row["Harman request Jun 7th"],
+                        ODMFeedback: row["ODM feedback Jun 10th"],
+                        // 
                         Reference: row["Reference"],
                         CreationDate: formatDate(row["Created on Date"]),
                         InboundDelivery: row["Inbound Delivery"],
@@ -625,7 +645,7 @@ sap.ui.define([
                         MRPRelevant: row["MRP relevant"]||row["MRP Relevent"],
                         MRPMaterial: row["MPN Material"]||row["MPN material"],
                         CreationIndicator: row["Creation Indicator"]||row["Creation Indicator"],
-                        SequenceNumber: row["Sequence Number"]||row["Sequence number"],
+                        SequenceNumber: row["Sequence Number"]||row["Sequence number"]||row["Seq Num"],
                         StatusFlag: row["Status"],
                         RejectReason: row["Comment"],
                         ActionDate: formatDate(row["Action Date"]),
@@ -644,11 +664,11 @@ sap.ui.define([
                 const oValueHelpModel = new JSONModel(valueHelpData);
                 that.getOwnerComponent().setModel(oValueHelpModel, "valueHelpModel");
 
-                let newData= that.transformDataForTreeTable(formattedData)
-                let aDateNewData=that._processData(newData)
-                that.aOldData = JSON.parse(JSON.stringify(aDateNewData));
+                // let newData= that.transformDataForTreeTable(formattedData)
+                // let aDateNewData=that._processData(newData)
+                // that.aOldData = JSON.parse(JSON.stringify(aDateNewData));  
 
-                that.getOwnerComponent().getModel("excelModel").setProperty("/data", aDateNewData);
+                that.getOwnerComponent().getModel("excelModel").setProperty("/data", formattedData);
 
                 // that._headerFB.setVisible(true)
                 MessageToast.show("Excel loaded for preview.");
@@ -1038,7 +1058,7 @@ sap.ui.define([
                 oInput.setValueState("None");
                 oInput.setValueStateText("");
                 const oTable = oEvent.getSource().getParent().getParent() // Ensure you have the ID of your TreeTable
-                const aRows = oTable.getItems();
+                const aRows = oTable.getRows();
 
                 aRows.forEach(oRow => {
                     const oRowContext = oRow.getBindingContext("excelModel");
@@ -1523,7 +1543,7 @@ sap.ui.define([
             if (!this._pPopover) {
                 this._pPopover = sap.ui.core.Fragment.load({
                     id: oView.getId(),
-                    name: "com.sap.pocompare.view.fragments.CommentPopover",
+                    name: "com.sap.poexcel.view.fragments.CommentPopover",
                     controller: this
                 }).then(function (oPopover) {
                     oView.addDependent(oPopover);
@@ -1549,7 +1569,7 @@ sap.ui.define([
             if (!this._pqPopover) {
                 this._pqPopover = sap.ui.core.Fragment.load({
                     id: oView.getId(),
-                    name: "com.sap.pocompare.view.fragments.QlikCommentPopover",
+                    name: "com.sap.poexcel.view.fragments.QlikCommentPopover",
                     controller: this
                 }).then(function (oPopover) {
                     oView.addDependent(oPopover);

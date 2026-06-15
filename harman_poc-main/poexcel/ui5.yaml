@@ -2,7 +2,7 @@
 
 specVersion: "4.0"
 metadata:
-  name: com.sap.pocompare
+  name: com.sap.poexcel
 type: application
 server:
   customMiddleware:
@@ -15,6 +15,10 @@ server:
             - /resources
             - /test-resources
           url: https://ui5.sap.com
+        backend:
+          - path: /odata
+            url: https://harman-becker-automotive-systems-gmbh-sap-build-process1f9f3b2c.cfapps.eu10-004.hana.ondemand.com
+            destination: EMAIL_CFG_CAP
     - name: fiori-tools-appreload
       afterMiddleware: compression
       configuration:
@@ -26,13 +30,3 @@ server:
       configuration:
         flp:
           theme: sap_horizon
-    - name: sap-fe-mockserver
-      beforeMiddleware: csp
-      configuration:
-        mountPath: /
-        services:
-          - urlPath: /odata/v4/stateless
-            metadataPath: ./webapp/localService/mainService/metadata.xml
-            mockdataPath: ./webapp/localService/mainService/data
-            generateMockData: true
-        annotations: []

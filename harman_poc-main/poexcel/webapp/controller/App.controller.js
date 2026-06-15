@@ -3,7 +3,7 @@ sap.ui.define([
 ], (BaseController) => {
   "use strict";
 
-  return BaseController.extend("com.sap.pocompare.controller.App", {
+  return BaseController.extend("com.sap.poexcel.controller.App", {
       onInit() {
       }
   });

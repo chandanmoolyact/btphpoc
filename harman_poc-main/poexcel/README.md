@@ -8,7 +8,7 @@
 |**Template Used**<br>Basic V4|
 |**Service Type**<br>SAP System (ABAP On-Premise)|
 |**Service URL**<br>https://sandbox.api.sap.com/s4hanacloud/sap/opu/odata4/sap/api_purchaseorder_2/srvd_a2x/sap/purchaseorder/0001|
-|**Module Name**<br>pocompare|
+|**Module Name**<br>poexcel|
 |**Application Title**<br>PO Comparison Application|
 |**Namespace**<br>com.sap|
 |**UI5 Theme**<br>sap_horizon|
@@ -16,7 +16,7 @@
 |**Enable TypeScript**<br>False|
 |**Add Eslint configuration**<br>True, see https://www.npmjs.com/package/@sap-ux/eslint-plugin-fiori-tools#rules for the eslint rules.|
 
-## pocompare
+## poexcel
 
 PO Comparison Application
 

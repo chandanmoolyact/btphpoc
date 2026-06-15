@@ -1,5 +1,5 @@
 <mvc:View
-		controllerName="com.sap.pocompare.controller.First"
+		controllerName="com.sap.poexcel.controller.First"
 		xmlns:mvc="sap.ui.core.mvc"
 		xmlns="sap.m"
 		xmlns:f="sap.f"
@@ -79,7 +79,7 @@
 					</headerToolbar>
 					<content>
 						<core:Fragment
-							fragmentName="com.sap.pocompare.view.fragments.DynamicInput"
+							fragmentName="com.sap.poexcel.view.fragments.DynamicInput"
 							type="XML"/>
 					</content>
 				</Panel>
@@ -166,7 +166,7 @@
 		<!-- ── Main content ── -->
 		<f:content>
 			<core:Fragment
-				fragmentName="com.sap.pocompare.view.fragments.sections.PODynaTab"
+				fragmentName="com.sap.poexcel.view.fragments.sections.POUITable"
 				type="XML"/>
 		</f:content>
 

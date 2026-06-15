@@ -1,0 +1,19 @@
+<ActionSheet id="actionSheet"
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+	core:require="{ MessageToast: 'sap/m/MessageToast' }"
+	title="Choose Your Action"
+	showCancelButton="true"
+	placement="Right">
+	<Button text="Delete" tooltip="Delete"
+		icon="sap-icon://delete" type="Reject" press=".onDeleteVendorTreeRow"
+                            enabled="{= ${excelModel>ConfirmationCategory} === 'LA' || ${excelModel>StatusFlag} === 'R' ? false : true }" class="poActionBtn"/>
+	<Button text="Accept" type="Accept" tooltip="Accept" icon="sap-icon://accept" press=".onAcceptVendorTreeRow"
+                            enabled="{= ${excelModel>ConfirmationCategory} === 'LA' || ${excelModel>StatusFlag} === 'A' || ${excelModel>EDIFlag} !== 'E' ? false : true }" class="poActionBtn"/>
+	<Button text="Reject" type="Reject" tooltip="Reject" icon="sap-icon://decline" press=".onRejectVendorTreeRow"
+		enabled="{= ${excelModel>ConfirmationCategory} === 'LA' || ${excelModel>StatusFlag} === 'R' || ${excelModel>EDIFlag} !== 'E' ? false : true }" class="poActionBtn"/>
+	<Button text="Comment" tooltip="Comment" icon="sap-icon://comment" type="Emphasized" press=".handlePopoverPress"
+		enabled="{= ${excelModel>StatusFlag} !== 'R' ? false : true }" class="poActionBtn"/>
+	<Button text="Qlik View" tooltip="Qlik View" icon="sap-icon://detail-view" type="Emphasized" press=".handleQlikPopoverPress" class="poActionBtn"/>
+	<Button text="Add Row" tooltip="Add Row" icon="sap-icon://add" type="Emphasized" press=".onAddVendorRowSP" class="poActionBtn"/> 
+</ActionSheet>

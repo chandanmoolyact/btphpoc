@@ -1,10 +1,10 @@
 sap.ui.define([
     "sap/ui/core/UIComponent",
-    "com/sap/pocompare/model/models"
+    "com/sap/poexcel/model/models"
 ], (UIComponent, models) => {
     "use strict";
 
-    return UIComponent.extend("com.sap.pocompare.Component", {
+    return UIComponent.extend("com.sap.poexcel.Component", {
         metadata: {
             manifest: "json",
             interfaces: [
