@@ -21,24 +21,8 @@
         </extension>
 
         <columns>
-            <!-- <Column width="13rem" hAlign="Center">
-                <m:Label text="Action"/>
-                <template>
-                    <m:FlexBox alignItems="Center" justifyContent="Center" visible="{= ${excelModel>ConfirmationCategory} !== undefined &amp;&amp; ${excelModel>ConfirmationCategory} !== '' }">
-                        <m:Button icon="sap-icon://delete" type="Reject" press=".onDeleteVendorTreeRow"
-                            enabled="{= ${excelModel>ConfirmationCategory} === 'LA' || ${excelModel>StatusFlag} === 'R' ? false : true }" class="poActionBtn"/>
-                        <m:Button icon="sap-icon://accept" type="Success" press=".onAcceptVendorTreeRow"
-                            enabled="{= ${excelModel>ConfirmationCategory} === 'LA' || ${excelModel>StatusFlag} === 'A' || ${excelModel>EDIFlag} !== 'E' ? false : true }" class="poActionBtn"/>
-                        <m:Button icon="sap-icon://decline" type="Negative" press=".onRejectVendorTreeRow"
-                            enabled="{= ${excelModel>ConfirmationCategory} === 'LA' || ${excelModel>StatusFlag} === 'R' || ${excelModel>EDIFlag} !== 'E' ? false : true }" class="poActionBtn"/>
-                        <m:Button icon="sap-icon://comment" type="Emphasized" press=".handlePopoverPress"
-                            enabled="{= ${excelModel>StatusFlag} !== 'R' ? false : true }" class="poActionBtn"/>
-                        <m:Button icon="sap-icon://detail-view" type="Emphasized" press=".handleQlikPopoverPress" class="poActionBtn"/>
-                    </m:FlexBox>
-                </template>
-            </Column> -->
             <Column width="5rem" hAlign="Center">
-                <m:Label text="Action"/>
+                <m:Label text="Action" tooltip="Action"/>
                 <template>
                     <m:Button
                         icon="sap-icon://action"
@@ -53,8 +37,36 @@
                     </m:Button>
                 </template>
             </Column>
+            
+
+            <Column width="6rem" hAlign="Center" sortProperty="StatusFlag" filterProperty="StatusFlag">
+                <m:Label text="Conf. Status" tooltip="Conf. Status"/>
+                <template>
+                    <m:ObjectStatus inverted="true" visible="{= ${excelModel>StatusFlag} !== undefined &amp;&amp; ${excelModel>StatusFlag} !== '' }"
+                        text="{= ${excelModel>StatusFlag} === 'R' ? 'Rejected' : (${excelModel>StatusFlag} === 'A' ? 'Approved' : 'NA')}"
+                        state="{= ${excelModel>StatusFlag} === 'R' ? 'Error' : (${excelModel>StatusFlag} === 'A' ? 'Success' : 'Information')}"/>
+                </template>
+            </Column>
+
+            <Column width="5rem" hAlign="Center" sortProperty="EDIFlag" filterProperty="EDIFlag">
+                <m:Label text="EDI" tooltip="EDI"/>
+                <template>
+                    <m:ObjectStatus inverted="true"
+                        visible="{= ${excelModel>EDIFlag} === 'E' ? true : false}"
+                        text="{= ${excelModel>EDIFlag} === 'E' ? 'EDI' : 'SAP'}"
+                        state="{= ${excelModel>EDIFlag} === 'E' ? 'Warning' : 'Information'}"/>
+                </template>
+            </Column>
+
+             <Column width="4rem" hAlign="Center" sortProperty="ConfirmationCategory" filterProperty="ConfirmationCategory">
+                <m:Label text="CC" tooltip="Confirmation Category"/>
+                <template>
+                    <m:Text  text="{excelModel>ConfirmationCategory}" wrapping="false"/>
+                </template>
+            </Column>
+
             <Column width="7rem" sortProperty="Quantity" filterProperty="Quantity">
-                <m:Label text="Quantity"/>
+                <m:Label text="Quantity" tooltip="Quantity"/>
                 <template>
                     <m:Input value="{path: 'excelModel>Quantity', type: 'sap.ui.model.type.String', constraints: { search: '^[0-9]+$' }}"
                         visible="{= ${excelModel>ConfirmationCategory} !== undefined &amp;&amp; ${excelModel>ConfirmationCategory} !== '' }"
@@ -64,7 +76,7 @@
             </Column>
 
             <Column width="9rem" hAlign="Center" sortProperty="CreationDate" filterProperty="CreationDate">
-                <m:Label text="Conf. Delivery Date"/>
+                <m:Label text="Conf. Delivery Date" tooltip="Conf. Delivery Date"/>
                 <template>
                     <m:DatePicker valueState="{excelModel>DateState}" valueStateText="{excelModel>DateMsg}" value="{excelModel>CreationDate}"
                         visible="{= ${excelModel>ConfirmationCategory} !== undefined &amp;&amp; ${excelModel>ConfirmationCategory} !== '' }"
@@ -73,170 +85,141 @@
                 </template>
             </Column>
 
-            <!-- <Column width="9rem" sortProperty="Reference" filterProperty="Reference">
-                <m:Label text="Reference"/>
-                <template>
-                    <m:Input value="{excelModel>Reference}" visible="{= ${excelModel>ConfirmationCategory} !== undefined &amp;&amp; ${excelModel>ConfirmationCategory} !== '' }"
-                        editable="{= ${excelModel>newRecFlag} === false || ${excelModel>StatusFlag} === 'R' ? false : true }"/>
-                </template>
-            </Column>
-            <Column width="9rem" sortProperty="MRPMaterial" filterProperty="MRPMaterial">
-                <m:Label text="MRP Material"/>
-                <template>
-                    <m:Input value="{excelModel>MRPMaterial}" visible="{= ${excelModel>ConfirmationCategory} !== undefined &amp;&amp; ${excelModel>ConfirmationCategory} !== '' }"
-                        editable="{= ${excelModel>newRecFlag} === false || ${excelModel>StatusFlag} === 'R' ? false : true }"/>
-                </template>
-            </Column> -->
             <Column width="9rem" sortProperty="PONumber" filterProperty="PONumber">
-                <m:Label text="PO Number"/>
+                <m:Label text="PO Number" tooltip="PO Number"/>
                 <template>
                     <m:ObjectIdentifier title="{excelModel>PONumber}"/>
                 </template>
             </Column>
 
             <Column width="7rem" sortProperty="VendorCode" filterProperty="VendorCode">
-                <m:Label text="Vendor Code"/>
+                <m:Label text="Vendor Code" tooltip="Vendor Code"/>
                 <template>
                     <m:Text text="{excelModel>VendorCode}" wrapping="false"/>
                 </template>
             </Column>
 
-            <!-- <Column width="12rem" sortProperty="VendorName" filterProperty="VendorName">
-                <m:Label text="Vendor Description"/>
-                <template>
-                    <m:Text text="{excelModel>VendorName}" wrapping="false"/>
-                </template>
-            </Column> -->
-
             <Column width="8rem" hAlign="Center" sortProperty="PODate" filterProperty="PODate">
-                <m:Label text="PO Date"/>
+                <m:Label text="PO Date" tooltip="PO Date"/>
                 <template>
                     <m:Text text="{path: 'excelModel>PODate', formatter: '.formatter.formatDate'}" wrapping="false"/>
                 </template>
             </Column>
 
-            <!-- <Column width="5rem" hAlign="Center" sortProperty="POLineItem" filterProperty="POLineItem">
-                <m:Label text="Item"/>
-                <template>
-                    <m:Text text="{excelModel>POLineItem}" wrapping="false"/>
-                </template>
-            </Column> -->
-
-
             <Column width="4rem" hAlign="Center" sortProperty="SequenceNumber" filterProperty="SequenceNumber">
-                <m:Label text="SN"/>
+                <m:Label text="SN" tooltip="Sequence Number"/>
                 <template>
                     <m:Text text="{excelModel>SequenceNumber}" wrapping="false"/>
                 </template>
             </Column>
 
             <Column width="8rem" hAlign="Begin" sortProperty="ODM" filterProperty="ODM">
-                <m:Label text="ODM"/>
+                <m:Label text="ODM" tooltip="ODM"/>
                 <template>
                     <m:Text text="{excelModel>ODM}" wrapping="false"/>
                 </template>
             </Column>
 
             <Column width="10rem" hAlign="Begin" sortProperty="FactorySite" filterProperty="FactorySite">
-                <m:Label text="Factory site"/>
+                <m:Label text="Factory site" tooltip="Factory site"/>
                 <template>
                     <m:Text text="{excelModel>FactorySite}" wrapping="false"/>
                 </template>
             </Column>
 
             <Column width="6rem" hAlign="Center" sortProperty="Region" filterProperty="Region">
-                <m:Label text="Region"/>
+                <m:Label text="Region" tooltip="Region"/>
                 <template>
                     <m:Text text="{excelModel>Region}" wrapping="false"/>
                 </template>
             </Column>
 
             <Column width="10rem" hAlign="Begin" sortProperty="Project" filterProperty="Project">
-                <m:Label text="Project"/>
+                <m:Label text="Project" tooltip="Project"/>
                 <template>
                     <m:Text text="{excelModel>Project}" wrapping="false"/>
                 </template>
             </Column>
 
             <Column width="12rem" hAlign="Center" sortProperty="StatDelDate" filterProperty="StatDelDate">
-                <m:Label text="Statistical delivery date"/>
+                <m:Label text="Statistical delivery date" tooltip="Statistical delivery date"/>
                 <template>
                     <m:Text text="{excelModel>StatDelDate}" wrapping="false"/>
                 </template>
             </Column>
 
             <Column width="10rem" hAlign="Center" sortProperty="InitialDates" filterProperty="InitialDates">
-                <m:Label text="Initial dates:"/>
+                <m:Label text="Initial dates:" tooltip="Initial dates"/>
                 <template>
                     <m:Text text="{excelModel>InitialDates}" wrapping="false"/>
                 </template>
             </Column>
 
             <Column width="10rem" hAlign="Center" sortProperty="ODMCRDMar19" filterProperty="ODMCRDMar19">
-                <m:Label text="ODM CRD Mar 19"/>
+                <m:Label text="ODM CRD Mar 19" tooltip="ODM CRD Mar 19"/>
                 <template>
                     <m:Text text="{excelModel>ODMCRDMar19}" wrapping="false"/>
                 </template>
             </Column>
 
             <Column width="12rem" hAlign="Begin" sortProperty="ODMRemark" filterProperty="ODMRemark">
-                <m:Label text="ODM Remark"/>
+                <m:Label text="ODM Remark" tooltip="ODM Remark"/>
                 <template>
                     <m:Text text="{excelModel>ODMRemark}" wrapping="false"/>
                 </template>
             </Column>
 
             <Column width="12rem" hAlign="Begin" sortProperty="HarmanRemark" filterProperty="HarmanRemark">
-                <m:Label text="Harman Remark"/>
+                <m:Label text="Harman Remark" tooltip="Harman Remark"/>
                 <template>
                     <m:Text text="{excelModel>HarmanRemark}" wrapping="false"/>
                 </template>
             </Column>
 
             <Column width="8rem" hAlign="Center" sortProperty="Booking" filterProperty="Booking">
-                <m:Label text="Booking#"/>
+                <m:Label text="Booking#" tooltip="Booking Number"/>
                 <template>
                     <m:Text text="{excelModel>Booking}" wrapping="false"/>
                 </template>
             </Column>
 
             <Column width="10rem" hAlign="Center" sortProperty="ExFtCRD" filterProperty="ExFtCRD">
-                <m:Label text="Ex-factory/CRD"/>
+                <m:Label text="Ex-factory/CRD" tooltip="Ex-factory/CRD"/>
                 <template>
                     <m:Text text="{excelModel>ExFtCRD}" wrapping="false"/>
                 </template>
             </Column>
 
             <Column width="14rem" hAlign="Begin" sortProperty="RemarkCustomerAPAC" filterProperty="RemarkCustomerAPAC">
-                <m:Label text="Remark/Customer APAC"/>
+                <m:Label text="Remark/Customer APAC" tooltip="Remark/Customer APAC"/>
                 <template>
                     <m:Text text="{excelModel>RemarkCustomerAPAC}" wrapping="false"/>
                 </template>
             </Column>
 
             <Column width="12rem" hAlign="Center" sortProperty="HarmanReqDate" filterProperty="HarmanReqDate">
-                <m:Label text="Harman request Jun 7th"/>
+                <m:Label text="Harman request Jun 7th" tooltip="Harman request Jun 7th"/>
                 <template>
                     <m:Text text="{excelModel>HarmanReqDate}" wrapping="false"/>
                 </template>
             </Column>
 
             <Column width="12rem" hAlign="Center" sortProperty="ODMFeedback" filterProperty="ODMFeedback">
-                <m:Label text="ODM feedback Jun 10th"/>
+                <m:Label text="ODM feedback Jun 10th" tooltip="ODM feedback Jun 10th"/>
                 <template>
                     <m:Text text="{excelModel>ODMFeedback}" wrapping="false"/>
                 </template>
             </Column>
 
             <Column width="10rem" hAlign="Center" sortProperty="ShippingMode" filterProperty="ShippingMode">
-                <m:Label text="Shipping mode"/>
+                <m:Label text="Shipping mode" tooltip="Shipping mode"/>
                 <template>
                     <m:Text text="{excelModel>ShippingMode}" wrapping="false"/>
                 </template>
             </Column>
 
             <Column width="8rem" hAlign="End" sortProperty="Balance" filterProperty="Balance">
-                <m:Label text="Balance"/>
+                <m:Label text="Balance" tooltip="Balance"/>
                 <template>
                     <m:Text text="{excelModel>Balance}" wrapping="false"/>
                 </template>
@@ -245,165 +228,53 @@
 
 
             <Column width="7rem" hAlign="Center" sortProperty="DeliveryDate" filterProperty="DeliveryDate">
-                <m:Label text="Deliv. Date"/>
+                <m:Label text="Deliv. Date" tooltip="Delivery Date"/>
                 <template>
                     <m:Text text="{path: 'excelModel>DeliveryDate', formatter: '.formatter.formatDate'}" wrapping="false"/>
                 </template>
             </Column>
 
             <Column width="6rem" hAlign="End" sortProperty="POQuantity" filterProperty="POQuantity">
-                <m:Label text="PO Qty"/>
+                <m:Label text="PO Qty" tooltip="Purchase Order Quantity"/>
                 <template>
                     <m:Text text="{excelModel>POQuantity}" wrapping="false"/>
                 </template>
             </Column>
 
             <Column width="8rem" sortProperty="Material" filterProperty="Material">
-                <m:Label text="Material"/>
+                <m:Label text="Material" tooltip="Material"/>
                 <template>
                     <m:Text text="{excelModel>Material}" wrapping="false"/>
                 </template>
             </Column>
 
-            <!-- <Column width="12rem" sortProperty="MaterialDesc" filterProperty="MaterialDesc">
-                <m:Label text="Description"/>
-                <template>
-                    <m:Text text="{excelModel>MaterialDesc}" wrapping="false"/>
-                </template>
-            </Column> -->
-
-            <!-- <Column width="4rem" hAlign="Center" sortProperty="UOM" filterProperty="UOM">
-                <m:Label text="UOM"/>
-                <template>
-                    <m:Text text="{excelModel>UOM}" wrapping="false"/>
-                </template>
-            </Column> -->
-
             <Column width="6rem" hAlign="End" sortProperty="NetPrice" filterProperty="NetPrice">
-                <m:Label text="Net Price"/>
+                <m:Label text="Net Price" tooltip="Net Price"/>
                 <template>
                     <m:Text text="{excelModel>NetPrice}" wrapping="false"/>
                 </template>
             </Column>
 
             <Column width="4rem" hAlign="Center" sortProperty="Currency" filterProperty="Currency">
-                <m:Label text="Curr."/>
+                <m:Label text="Curr." tooltip="Currency"/>
                 <template>
                     <m:Text text="{excelModel>Currency}" wrapping="false"/>
                 </template>
             </Column>
 
-            <!-- <Column width="4rem" hAlign="Center" sortProperty="Per" filterProperty="Per">
-                <m:Label text="Per"/>
-                <template>
-                    <m:Text text="{excelModel>Per}" wrapping="false"/>
-                </template>
-            </Column> -->
-
-            <!-- <Column width="6rem" hAlign="Center" sortProperty="EDILIFlag" filterProperty="EDILIFlag">
-                <m:Label text="Item Status"/>
-                <template>
-                    <m:ObjectStatus inverted="true"
-                        tooltip="{= ${excelModel>EDILIFlag} === 'E' ? 'EDI' : 'SAP'}"
-                        text="{= ${excelModel>EDILIFlag} === 'E' ? 'EDI' : 'SAP'}"
-                        state="{= ${excelModel>EDILIFlag} === 'E' ? 'Warning' : 'Information'}"
-                        visible="{= ${excelModel>EDILIFlag} === 'E' ? true : false}"/>
-                </template>
-            </Column> -->
-
             <Column width="5rem" hAlign="Center" sortProperty="Plant" filterProperty="Plant">
-                <m:Label text="Plant"/>
+                <m:Label text="Plant" tooltip="Plant"/>
                 <template>
                     <m:Text text="{excelModel>Plant}" wrapping="false"/>
                 </template>
             </Column>
 
-            <!-- <Column width="6rem" hAlign="Center" sortProperty="StorageLocation" filterProperty="StorageLocation">
-                <m:Label text="Stor. Loc."/>
-                <template>
-                    <m:Text text="{excelModel>StorageLocation}" wrapping="false"/>
-                </template>
-            </Column> -->
-
-            
-
-            <Column width="5rem" hAlign="Center" sortProperty="EDIFlag" filterProperty="EDIFlag">
-                <m:Label text="EDI"/>
-                <template>
-                    <m:ObjectStatus inverted="true"
-                        visible="{= ${excelModel>EDIFlag} === 'E' ? true : false}"
-                        text="{= ${excelModel>EDIFlag} === 'E' ? 'EDI' : 'SAP'}"
-                        state="{= ${excelModel>EDIFlag} === 'E' ? 'Warning' : 'Information'}"/>
-                </template>
-            </Column>
-
-            <Column width="4rem" hAlign="Center" sortProperty="ConfirmationCategory" filterProperty="ConfirmationCategory">
-                <m:Label text="CC"/>
-                <template>
-                    <m:Text text="{excelModel>ConfirmationCategory}" wrapping="false"/>
-                </template>
-            </Column>
-
-
             <Column width="4rem" hAlign="Center" sortProperty="Item" filterProperty="Item">
-                <m:Label text="Conf. Item"/>
+                <m:Label text="Conf. Item" tooltip="Confirmation Item"/>
                 <template>
                     <m:Text text="{excelModel>Item}" wrapping="false"/>
                 </template>
             </Column>
-
-            <Column width="6rem" hAlign="Center" sortProperty="StatusFlag" filterProperty="StatusFlag">
-                <m:Label text="Conf. Status"/>
-                <template>
-                    <m:ObjectStatus inverted="true" visible="{= ${excelModel>StatusFlag} !== undefined &amp;&amp; ${excelModel>StatusFlag} !== '' }"
-                        text="{= ${excelModel>StatusFlag} === 'R' ? 'Rejected' : (${excelModel>StatusFlag} === 'A' ? 'Approved' : 'NA')}"
-                        state="{= ${excelModel>StatusFlag} === 'R' ? 'Error' : (${excelModel>StatusFlag} === 'A' ? 'Success' : 'Information')}"/>
-                </template>
-            </Column>
-
-            <!-- <Column width="4rem" hAlign="Center" sortProperty="FDDCategory" filterProperty="FDDCategory">
-                <m:Label text="D"/>
-                <template>
-                    <m:Text text="{excelModel>FDDCategory}" wrapping="false"/>
-                </template>
-            </Column> -->
-
-            <!-- <Column width="8rem" sortProperty="InboundDelivery" filterProperty="InboundDelivery">
-                <m:Label text="Inbound Del."/>
-                <template>
-                    <m:Text text="{excelModel>InboundDelivery}" wrapping="false"/>
-                </template>
-            </Column> -->
-
-            <!-- <Column width="5rem" hAlign="Center" sortProperty="QtyReduced" filterProperty="QtyReduced">
-                <m:Label text="Qty Red."/>
-                <template>
-                    <m:Text text="{excelModel>QtyReduced}" wrapping="false"/>
-                </template>
-            </Column> -->
-
-            <!-- <Column width="5rem" hAlign="Center" sortProperty="MRPRelevant" filterProperty="MRPRelevant">
-                <m:Label text="MRP Rel."/>
-                <template>
-                    <m:Text text="{excelModel>MRPRelevant}" wrapping="false"/>
-                </template>
-            </Column> -->
-
-            
-
-            <!-- <Column width="4rem" hAlign="Center" sortProperty="CreationIndicator" filterProperty="CreationIndicator">
-                <m:Label text="CI"/>
-                <template>
-                    <m:Text text="{excelModel>CreationIndicator}" wrapping="false"/>
-                </template>
-            </Column> -->
-
-            <!-- <Column width="4rem" hAlign="Center" sortProperty="SequenceNumber" filterProperty="SequenceNumber">
-                <m:Label text="SN"/>
-                <template>
-                    <m:Text text="{excelModel>SequenceNumber}" wrapping="false"/>
-                </template>
-            </Column> -->
         </columns>
     </Table>
 </core:FragmentDefinition>

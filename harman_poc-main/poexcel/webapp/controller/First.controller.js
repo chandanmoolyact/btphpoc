@@ -29,13 +29,34 @@ sap.ui.define([
         onAfterRendering: function () {
             // this.oAdaptFilterBtn=sap.ui.getCore().byId("container-com.sap.poexcel---First--idTreeFilterBar-btnFilters-content")
             // this.oAdaptFilterBtn.setVisible(false)
-            this._injectL3ScrollStyles();
-            this._patchL3ScrollDom();
         },
+        // onActionButtonPress: function (oEvent) {
+        //     var oButton = oEvent.getSource();
+		// 	this.byId("actionSheet").openBy(oButton);
+        // },
+
         onActionButtonPress: function (oEvent) {
-            var oButton = oEvent.getSource();
-			this.byId("actionSheet").openBy(oButton);
-        },
+                var oButton = oEvent.getSource();
+                that.oCurrBtn=oButton;
+                
+                // Get the binding context of the specific table row clicked
+                var oContext = oButton.getBindingContext("excelModel");
+
+                // Load the ActionSheet fragment if it doesn't exist yet
+                if (!this._oActionSheet) {
+                    this._oActionSheet = sap.ui.xmlfragment(
+                        "com.sap.poexcel.view.fragments.ActionSheet", 
+                        this
+                    );
+                    this.getView().addDependent(this._oActionSheet);
+                }
+
+                // Pass the row's context directly to the ActionSheet so its inner buttons can see 'excelModel'
+                this._oActionSheet.setBindingContext(oContext, "excelModel");
+
+                // Open the ActionSheet next to the clicked button
+                this._oActionSheet.openBy(oButton);
+            },
 
         //Value Help Start
         getUniqueValueHelpDesc: function (data) {
@@ -256,237 +277,6 @@ sap.ui.define([
     var aFilteredData = evaluateAndFilterTree(this._oOriginalData, aFilterKeys);
     oModel.setProperty("/data", aFilteredData);
 },
-        // onSearchFilterBar: function () {
-        //     var oModel = this.getView().getModel("excelModel");
-            
-        //     // 1. Keep a pristine copy of your original dataset
-        //     if (!this._oOriginalData) {
-        //         this._oOriginalData = JSON.parse(JSON.stringify(oModel.getProperty("/data")));
-        //     }
-
-        //     // 2. Extract active filter criteria from the FilterBar
-        //     var oActiveFilters = {};
-        //     this.oFilterBar.getFilterGroupItems().forEach(function (oItem) {
-        //         var oControl = oItem.getControl();
-        //         var sName = oItem.getName();
-        //         var sClassName = oControl.getMetadata().getName();
-                
-        //         // --- A. Handle DateRangeSelection ---
-        //         if (sClassName === "sap.m.DateRangeSelection") {
-        //             var oDateStart = oControl.getDateValue();
-        //             var oDateEnd = oControl.getSecondDateValue();
-                    
-        //             if (oDateStart && oDateEnd) {
-        //                 var oStart = new Date(oDateStart); oStart.setHours(0,0,0,0);
-        //                 var oEnd = new Date(oDateEnd); oEnd.setHours(23,59,59,999);
-                        
-        //                 oActiveFilters[sName] = {
-        //                     isDateRange: true,
-        //                     start: oStart.getTime(),
-        //                     end: oEnd.getTime()
-        //                 };
-        //             }
-        //         } 
-        //         // --- B. Handle Select (Dropdown) ---
-        //         else if (sClassName === "sap.m.Select") {
-        //             var sSelectedKey = oControl.getSelectedKey();
-        //             // Only add to active filters if a valid key is selected (ignores empty strings/default "Select All" keys)
-        //             if (sSelectedKey && sSelectedKey !== "") {
-        //                 oActiveFilters[sName] = {
-        //                     isSelectKey: true,
-        //                     value: sSelectedKey.trim() // Keep exact casing if needed, or handle matching below
-        //                 };
-        //             }
-        //         } 
-        //         // --- C. Handle Regular Inputs ---
-        //         else {
-        //             var sValue = oControl.getValue ? oControl.getValue() : null;
-        //             if (sValue) {
-        //                 oActiveFilters[sName] = sValue.toLowerCase().trim();
-        //             }
-        //         }
-        //     });
-
-        //     var aFilterKeys = Object.keys(oActiveFilters);
-
-        //     // If no filters are filled out, instantly restore original tree and exit
-        //     if (aFilterKeys.length === 0) {
-        //         oModel.setProperty("/data", JSON.parse(JSON.stringify(this._oOriginalData)));
-        //         return;
-        //     }
-
-        //     // 3. Deep evaluation function to ensure ALL active filter keys are satisfied in this branch
-        //     function evaluateAndFilterTree(aNodes, aPendingKeys) {
-        //         if (!aNodes || aNodes.length === 0) { return []; }
-
-        //         return aNodes.map(function (oNode) {
-        //             // Create a deep copy of the node so we don't manipulate the master array
-        //             var oClonedNode = Object.assign({}, oNode);
-
-        //             // Check which of the remaining filter keys match the current node level
-        //             var aMatchedKeysAtThisLevel = aPendingKeys.filter(function (sKey) {
-        //                 var filterConfig = oActiveFilters[sKey];
-        //                 var nodeValue = oClonedNode[sKey];
-                        
-        //                 // If the node doesn't possess this property at its level, it can't match it here
-        //                 if (nodeValue === undefined || nodeValue === null) { return false; }
-
-        //                 // --- Handle Date Range Filter Type ---
-        //                 if (filterConfig && filterConfig.isDateRange) {
-        //                     var oNodeDate = new Date(nodeValue);
-        //                     if (isNaN(oNodeDate.getTime())) { return false; }
-                            
-        //                     var iNodeTime = oNodeDate.getTime();
-        //                     return iNodeTime >= filterConfig.start && iNodeTime <= filterConfig.end;
-        //                 }
-
-        //                 // --- Handle Select Dropdown Key Type ---
-        //                 if (filterConfig && filterConfig.isSelectKey) {
-        //                     // Direct strict comparison (or .toLowerCase() comparison if data values might mismatch in casing)
-        //                     return String(nodeValue).trim() === filterConfig.value;
-        //                 }
-
-        //                 // --- Handle Regular String Filters ---
-        //                 return String(nodeValue).toLowerCase().includes(filterConfig);
-        //             });
-
-        //             // Calculate remaining filter keys that still need to be satisfied by children
-        //             var aRemainingKeys = aPendingKeys.filter(function (sKey) {
-        //                 return !aMatchedKeysAtThisLevel.includes(sKey);
-        //             });
-
-        //             // If this node has sub-items (children), dig deeper with the remaining un-matched filters
-        //             if (oClonedNode.children && oClonedNode.children.length > 0) {
-        //                 var aFilteredChildren = evaluateAndFilterTree(oClonedNode.children, aRemainingKeys);
-                        
-        //                 if (aFilteredChildren.length > 0) {
-        //                     oClonedNode.children = aFilteredChildren;
-        //                     // Automatically keep hierarchy open to show where the matches occurred
-        //                     oClonedNode.PanelVisible = true;
-        //                     oClonedNode.NextPanelVisible = true;
-                            
-        //                     // If children successfully cleared out all remaining criteria, this node is valid!
-        //                     return oClonedNode;
-        //                 }
-        //             }
-
-        //             // If there are no children left, but we satisfied ALL active filters along this path:
-        //             if (aRemainingKeys.length === 0) {
-        //                 return oClonedNode;
-        //             }
-
-        //             return null; // Drop this node; it didn't fulfill the "AND" requirements
-        //         }).filter(Boolean); // Clear out null entries
-        //     }
-
-        //     // 4. Run the data clone through the custom AND pipeline and update view
-        //     var aDeepCopyOfData = JSON.parse(JSON.stringify(this._oOriginalData));
-        //     var aFilteredData = evaluateAndFilterTree(aDeepCopyOfData, aFilterKeys);
-            
-        //     oModel.setProperty("/data", aFilteredData);
-
-        //     this._injectL3ScrollStyles();
-        //     this._patchL3ScrollDom();
-        // },
-        /**
-         * CSS rules for L3 scroll styling and popin overflow.
-         */
-        _injectL3ScrollStyles: function () {
-            // Remove old cached style tag if present so fresh rules apply
-            var old = document.getElementById("poScrollStyles");
-            if (old) old.remove();
-
-            var s = document.createElement("style");
-            s.id = "poScrollStyles";
-            s.textContent = [
-                /* Parent popin cells — don't clip the L3 scroll area */
-                ".sapMListTblSubCnt .sapMPanel,",
-                ".sapMListTblSubCnt .sapMPanelContent {",
-                "  overflow:visible !important;",
-                "  max-width:none !important;",
-                "  padding:0 !important;",
-                "  margin:0 !important;",
-                "}",
-                ".sapMListTblSubCnt {",
-                "  overflow:visible !important;",
-                "  padding-left:0 !important;",
-                "  padding-right:0 !important;",
-                "}",
-                ".sapMListTblSubRow > td {",
-                "  overflow:visible !important;",
-                "  max-width:none !important;",
-                "}"
-            ].join("\n");
-            document.head.appendChild(s);
-        },
-
-        /**
-         * Finds every rendered .poL3Scroll DOM node and forces
-         * display:block + overflow-x:auto via inline JS. Also walks up
-         * from each L3 node and unlocks overflow-x on all ancestors
-         * up to the popin row boundary.
-         */
-        _patchL3ScrollDom: function () {
-            var nodes = document.querySelectorAll(".poL3Scroll");
-            if (!nodes.length) return;
-
-            // Inject a unique ID on each node so we can target it precisely
-            var styleRules = [];
-            nodes.forEach(function (el, i) {
-                // Force scroll behaviour inline
-                el.style.setProperty("display", "block", "important");
-                el.style.setProperty("overflow-x", "auto", "important");
-                el.style.setProperty("width", "100%", "important");
-                el.style.setProperty("-webkit-overflow-scrolling", "touch");
-                el.style.setProperty("scrollbar-width", "thin");
-                el.style.setProperty("scrollbar-color", "#c49000 transparent");
-
-                // Assign a unique ID for webkit scrollbar pseudo targeting
-                var uid = "poL3Scroll_" + i;
-                el.setAttribute("data-scrollid", uid);
-
-                styleRules.push(
-                    "[data-scrollid='" + uid + "']::-webkit-scrollbar { height:4px !important; }",
-                    "[data-scrollid='" + uid + "']::-webkit-scrollbar-track { background:transparent !important; }",
-                    "[data-scrollid='" + uid + "']::-webkit-scrollbar-thumb { background:#c49000 !important; border-radius:4px !important; min-width:30px !important; }",
-                    "[data-scrollid='" + uid + "']::-webkit-scrollbar-thumb:hover { background:#9a7000 !important; }"
-                );
-
-                // Unlock overflow on ancestors up to popin row
-                var parent = el.parentElement;
-                var maxWalk = 10;
-                while (parent && maxWalk-- > 0) {
-                    var cls = parent.className || "";
-                    if (cls.indexOf("sapMListTblSubRow") !== -1 ||
-                        cls.indexOf("poHeaderTable") !== -1 ||
-                        cls.indexOf("poLinesTable") !== -1) {
-                        parent.style.setProperty("overflow-x", "visible", "important");
-                        parent.querySelectorAll(":scope > td").forEach(function (td) {
-                            td.style.setProperty("overflow", "visible", "important");
-                            td.style.setProperty("max-width", "none", "important");
-                        });
-                        break;
-                    }
-                    var cs = window.getComputedStyle(parent);
-                    if (cs.overflow === "hidden" || cs.overflowX === "hidden") {
-                        parent.style.setProperty("overflow-x", "visible", "important");
-                    }
-                    if (cs.maxWidth && cs.maxWidth !== "none") {
-                        parent.style.setProperty("max-width", "none", "important");
-                    }
-                    parent = parent.parentElement;
-                }
-            });
-
-            // Inject/replace the scrollbar style rules
-            var tag = document.getElementById("poL3ScrollbarStyle");
-            if (!tag) {
-                tag = document.createElement("style");
-                tag.id = "poL3ScrollbarStyle";
-                document.head.appendChild(tag);
-            }
-            tag.textContent = styleRules.join("\n");
-        },
 
         // Triggered when a file is selected via the FileUploader
         onFileChange: function (oEvent) {
@@ -551,7 +341,6 @@ sap.ui.define([
 
         // Helper function using SheetJS (XLSX)
         _readExcel: function (file) {
-            var that = this;
             var reader = new FileReader();
 
             reader.onload = function (e) {
@@ -594,197 +383,128 @@ sap.ui.define([
                         var year = d.getUTCFullYear();
                         return month + "/" + day + "/" + year;
                     };
+                    // return {
+                    //     //Level 1 Start
+                    //     VendorCode: row["Vendor Code"]||row["vendor code"],
+                    //     ODM:row["ODM"],
+                    //     FactorySite:row["Factory site"],
+                    //     Region:row["Region"],
+                    //     Project:row["Project"],
+                    //     VendorName: row["Vendor Name"]||row["Vendor name"],
+                    //     PONumber: row["PO Number"] || row["PONumber"]||row["PO#"],
+                    //     PODate: formatDate(row["PO date"])||formatDate(row["Doc date"]),
+                    //     PanelVisible:false,
+                    //     //Level 2 Start
+                    //     StatDelDate: row["Statistical delivery date"]||row["Statistical Delivery Date"],
+                    //     InitialDates: row["Initial dates:"]||row["Initial dates:"],
+                    //     ODMCRDMar19: row["ODM CRD Mar 19"]||row["ODM CRD Mar 19"],
+                    //     ODMRemark: row["ODM Remark"]||row["ODM Remark"],
+                    //     HarmanRemark: row["Harman Remark"]||row["Harman Remark"],
+                    //     POLineItem: row["PO Line Item"] || row["LineItem"],
+                    //     Material: row["Material"]||row["SKU"],
+                    //     MaterialDesc: row["Material Description"],
+                    //     POQuantity: row["PO Qty"]||row["PO Quantity"],
+                    //     UOM: row["Unit of Measure"],
+                    //     DeliveryDate: formatDate(row["Delivery Date"]) ||formatDate(row["Harman request Jun 7th"]),
+                    //     NetPrice: row["Net Price"]||row["PO U/P"],
+                    //     Currency: row["Currency"]||row["Curr#"],
+                    //     Balance: row["Balance"],
+                    //     Per: row["Per"],
+                    //     MaterialGroup: row["Material Group"],
+                    //     Plant : row["Plant"],
+                    //     StorageLocation : row["Storage Location"],
+                    //     //Level 3 Start
+                    //     ConfirmationCategory:row["Confirmation category"]||row["Order Status"],
+                    //     ShippingMode:row["Shipping mode"]||row["Shipping Mode"]||row[" Shipping mode "],
+                    //     FDDCategory: row["Fdelivery Date category"] || row["FDelivery Date Category"] || row["Delivery Date Category"],
+                    //     Quantity: row["Quantity"],
+                    //     Booking: row["Booking#"],
+                    //     ExFtCRD: row["Ex-factory/CRD"],
+                    //     RemarkCustomerAPAC: row["Remark/Customer APAC"],
+                    //     HarmanReqDate: row["Harman request Jun 7th"],
+                    //     ODMFeedback: row["ODM feedback Jun 10th"],
+                    //     // 
+                    //     Reference: row["Reference"],
+                    //     CreationDate: formatDate(row["Created on Date"]),
+                    //     InboundDelivery: row["Inbound Delivery"],
+                    //     Item: row["Item"],
+                    //     HLItem: row["Higher Level Item"],
+                    //     Batch: row["Batch"],
+                    //     QtyReduced: row["Quantity Reduced"],
+                    //     MRPRelevant: row["MRP relevant"]||row["MRP Relevent"],
+                    //     MRPMaterial: row["MPN Material"]||row["MPN material"],
+                    //     CreationIndicator: row["Creation Indicator"]||row["Creation Indicator"],
+                    //     SequenceNumber: row["Sequence Number"]||row["Sequence number"]||row["Seq Num"],
+                    //     StatusFlag: row["Status"],
+                    //     RejectReason: row["Comment"],
+                    //     ActionDate: formatDate(row["Action Date"]),
+                    //     EmailFlag: row["Email Flag"]||row["EmailFlag"],   
+                    //     EDIFlag: row["EDI Flag"]||row["EDIFlag"],  
+                    //     QlikQty: row["Qlik Qty"] || row["QLIK Qty"],
+                    //     QlikDate: formatDate(row["Qlik Date"] || row["QLIK Date"]),
+                    //     DateState: "None",
+                    //     DateMsg: "",
+                    //     // These are the properties our validation logic uses!
+                    //     //Status 4
+                    // };
                     return {
-                        //Level 1 Start
-                        VendorCode: row["Vendor Code"]||row["vendor code"],
-                        ODM:row["ODM"],
-                        FactorySite:row["Factory site"],
-                        Region:row["Region"],
-                        Project:row["Project"],
-                        VendorName: row["Vendor Name"]||row["Vendor name"],
-                        PONumber: row["PO Number"] || row["PONumber"]||row["PO#"],
-                        PODate: formatDate(row["PO date"])||formatDate(row["Doc date"]),
-                        PanelVisible:false,
-                        //Level 2 Start
-                        StatDelDate: row["Statistical delivery date"]||row["Statistical Delivery Date"],
-                        InitialDates: row["Initial dates:"]||row["Initial dates:"],
-                        ODMCRDMar19: row["ODM CRD Mar 19"]||row["ODM CRD Mar 19"],
-                        ODMRemark: row["ODM Remark"]||row["ODM Remark"],
-                        HarmanRemark: row["Harman Remark"]||row["Harman Remark"],
-                        POLineItem: row["PO Line Item"] || row["LineItem"],
-                        Material: row["Material"]||row["SKU"],
-                        MaterialDesc: row["Material Description"],
-                        POQuantity: row["PO Qty"]||row["PO Quantity"],
-                        UOM: row["Unit of Measure"],
-                        DeliveryDate: formatDate(row["Delivery Date"]) ||formatDate(row["Harman request Jun 7th"]),
-                        NetPrice: row["Net Price"]||row["PO U/P"],
-                        Currency: row["Currency"]||row["Curr#"],
+                        // Level 1
+                        VendorCode: row["Vendor Code"] || row["vendor code"],
+                        ODM: row["ODM"],
+                        FactorySite: row["Factory site"],
+                        Region: row["Region"],
+                        Project: row["Project"],
+                        PONumber: row["PO Number"] || row["PONumber"] || row["PO#"],
+                        PODate: formatDate(row["PO date"]) || formatDate(row["Doc date"]),
+
+                        // Level 2
+                        StatDelDate: row["Statistical delivery date"] || row["Statistical Delivery Date"],
+                        InitialDates: row["Initial dates:"] || row["Initial dates:"],
+                        ODMCRDMar19: row["ODM CRD Mar 19"] || row["ODM CRD Mar 19"],
+                        ODMRemark: row["ODM Remark"] || row["ODM Remark"],
+                        HarmanRemark: row["Harman Remark"] || row["Harman Remark"],
+                        Material: row["Material"] || row["SKU"],
+                        POQuantity: row["PO Qty"] || row["PO Quantity"],
+                        NetPrice: row["Net Price"] || row["PO U/P"],
+                        Currency: row["Currency"] || row["Curr#"],
                         Balance: row["Balance"],
-                        Per: row["Per"],
-                        MaterialGroup: row["Material Group"],
-                        Plant : row["Plant"],
-                        StorageLocation : row["Storage Location"],
-                        //Level 3 Start
-                        ConfirmationCategory:row["Confirmation category"]||row["Order Status"],
-                        ShippingMode:row["Shipping mode"]||row["Shipping Mode"],
-                        FDDCategory: row["Fdelivery Date category"] || row["FDelivery Date Category"] || row["Delivery Date Category"],
-                        Quantity: row["Quantity"],
+                        Plant: row["Plant"],
+
+                        // Level 3
+                        ConfirmationCategory: row["Confirmation category"] || row["Order Status"],
+                        ShippingMode: row["Shipping mode"] || row["Shipping Mode"] || row[" Shipping mode "],
                         Booking: row["Booking#"],
                         ExFtCRD: row["Ex-factory/CRD"],
                         RemarkCustomerAPAC: row["Remark/Customer APAC"],
                         HarmanReqDate: row["Harman request Jun 7th"],
                         ODMFeedback: row["ODM feedback Jun 10th"],
-                        // 
-                        Reference: row["Reference"],
-                        CreationDate: formatDate(row["Created on Date"]),
-                        InboundDelivery: row["Inbound Delivery"],
                         Item: row["Item"],
-                        HLItem: row["Higher Level Item"],
-                        Batch: row["Batch"],
-                        QtyReduced: row["Quantity Reduced"],
-                        MRPRelevant: row["MRP relevant"]||row["MRP Relevent"],
-                        MRPMaterial: row["MPN Material"]||row["MPN material"],
-                        CreationIndicator: row["Creation Indicator"]||row["Creation Indicator"],
-                        SequenceNumber: row["Sequence Number"]||row["Sequence number"]||row["Seq Num"],
+                        SequenceNumber: row["Sequence Number"] || row["Sequence number"] || row["Seq Num"],
                         StatusFlag: row["Status"],
                         RejectReason: row["Comment"],
                         ActionDate: formatDate(row["Action Date"]),
-                        EmailFlag: row["Email Flag"]||row["EmailFlag"],   
-                        EDIFlag: row["EDI Flag"]||row["EDIFlag"],  
+                        EmailFlag: row["Email Flag"] || row["EmailFlag"],   
+                        EDIFlag: row["EDI Flag"] || row["EDIFlag"],    
                         QlikQty: row["Qlik Qty"] || row["QLIK Qty"],
-                        QlikDate: formatDate(row["Qlik Date"] || row["QLIK Date"]),
-                        DateState: "None",
-                        DateMsg: "",
-                        // These are the properties our validation logic uses!
-                        //Status 4
-                    };
+                        QlikDate: formatDate(row["Qlik Date"] || row["QLIK Date"])
+                    }
                 });
 
                 const valueHelpData=that.getUniqueValueHelpDesc(formattedData);
                 const oValueHelpModel = new JSONModel(valueHelpData);
                 that.getOwnerComponent().setModel(oValueHelpModel, "valueHelpModel");
 
-                // let newData= that.transformDataForTreeTable(formattedData)
-                // let aDateNewData=that._processData(newData)
-                // that.aOldData = JSON.parse(JSON.stringify(aDateNewData));  
+                that.aOldData = JSON.parse(JSON.stringify(formattedData));  
 
                 that.getOwnerComponent().getModel("excelModel").setProperty("/data", formattedData);
 
                 // that._headerFB.setVisible(true)
                 MessageToast.show("Excel loaded for preview.");
-                setTimeout(function () { that._patchL3ScrollDom(); }, 300);
             };
             reader.onerror = function (ex) {
                 MessageBox.error("Error reading the Excel file.");
             };
             reader.readAsBinaryString(file);
-        },
-        transformDataForTreeTable: function(rawJsonString) {
-            const flatData = rawJsonString;
-            const groupedData = {};
-            flatData.forEach((item) => {
-                // ==========================================
-                // LEVEL 1: Header Level Grouping
-                // Key based on PONumber, VendorCode, VendorName, PODate
-                // ==========================================
-                const level1Key = `${item.PONumber}_${item.VendorCode}_${item.VendorName}_${item.PODate}`;
-                // Initialize the Level 1 group if it doesn't exist
-                if (!groupedData[level1Key]) {
-                    groupedData[level1Key] = {
-                        PONumber: item.PONumber,
-                        VendorCode: item.VendorCode,
-                        VendorName: item.VendorName,
-                        PODate: item.PODate,
-                        PanelVisible: item.PanelVisible,
-                        DocumentDate: item.DocumentDate,
-                        EDIHFlag: item.EDIFlag,
-                        // We use a temporary map to easily group Level 2 items without duplicating them
-                        _level2ItemsMap: {}, 
-                        children: [] 
-                    };
-                }
-                // ==========================================
-                // LEVEL 2: Line Item Level Grouping
-                // Key based on POLineItem (to group multiple sequences under one line)
-                // ==========================================
-                const level2Key = `${item.POLineItem}`;
-                // Initialize Level 2 if it doesn't exist under this specific Level 1 node
-                if (!groupedData[level1Key]._level2ItemsMap[level2Key]) {
-                    groupedData[level1Key]._level2ItemsMap[level2Key] = {
-                        // Showing upper-level fields + Line item info
-                        PONumber: item.PONumber,
-                        VendorCode: item.VendorCode,
-                        VendorName: item.VendorName,
-                        PODate: item.PODate,
-                        POLineItem: item.POLineItem, // Using actual PO Line Item instead of mock
-                        Material: item.Material,
-                        MaterialDesc: item.MaterialDesc,
-                        POQuantity: item.POQuantity,
-                        UOM: item.UOM,
-                        NetPrice: item.NetPrice,
-                        Currency: item.Currency,
-                        Per: item.Per,
-                        MaterialGroup: item.MaterialGroup,
-                        Plant : item.Plant,
-                        StorageLocation : item.StorageLocation,
-                        NextPanelVisible: false,
-                        DeliveryDate: item.DeliveryDate,
-                        EDILIFlag: item.EDIFlag,
-                        children: [] // This will hold the Level 3 sequences
-
-                    };
-                }
-                // ==========================================
-                // LEVEL 3: Sequence Level Details
-                // ==========================================
-                const level3Node = {
-                    PONumber: item.PONumber, 
-                    VendorCode: item.VendorCode,
-                    VendorName: item.VendorName,
-                    PODate: item.PODate,
-                    POLineItem: item.POLineItem,
-                    SequenceNumber: item.SequenceNumber, // The differentiator for Level 3
-                    DeliveryDate: item.DeliveryDate,
-                    ConfirmationCategory: item.ConfirmationCategory,
-                    FDDCategory: item.FDDCategory,
-                    Quantity: item.Quantity,
-                    Reference: item.Reference,
-                    CreationDate: item.CreationDate,
-                    InboundDelivery: item.InboundDelivery,
-                    Item: item.Item,
-                    HLItem: item.HLItem,
-                    Batch: item.Batch,
-                    QtyReduced: item.QtyReduced,
-                    MRPRelevant: item.MRPRelevant,
-                    MRPMaterial: item.MRPMaterial,
-                    CreationIndicator: item.CreationIndicator,
-                    newRecFlag:false,
-                    StatusFlag:item.StatusFlag,
-                    RejectReason:item.RejectReason,
-                    QlikQty: item.QlikQty,
-                    QlikDate: item.QlikDate,
-                    ActionDate:item.ActionDate,   
-                    EDIFlag:item.EDIFlag,   
-                    DateState: "None",
-                    DateMsg: "",
-                    EmailFlag: item.EmailFlag
-                };
-                // Push the Level 3 detail into the correct Level 2 node's children array
-                groupedData[level1Key]._level2ItemsMap[level2Key].children.push(level3Node);
-            });
-            // ==========================================
-            // FINAL CLEANUP: Convert Maps back to Arrays
-            // ==========================================
-            // UI5 JSONModels need standard arrays for "children", not object maps.
-            const treeData = Object.values(groupedData).map(level1Node => {
-                // Extract Level 2 items from the temporary map into the children array
-                level1Node.children = Object.values(level1Node._level2ItemsMap);
-                // Remove the temporary map so it doesn't clutter your UI5 model
-                delete level1Node._level2ItemsMap; 
-                return level1Node;
-            });
-
-            return treeData;
         },
          _processData: function (aData) {
             aData.forEach(level1 => {
@@ -819,89 +539,6 @@ sap.ui.define([
         },
         onDownloadTemplate: function () {
         },
-        // onSaveTemplate: async function (oEvent) {
-        //     var treeData = this.getView().getModel("excelModel").getProperty("/data");
-
-
-
-        //     var oCAPModel = this.getOwnerComponent().getModel("capService"); 
-        //     var oActionContext = oCAPModel.bindContext("/sendMailContent(...)");
-        //     // oActionContext.setParameter("poHeader", JSON.stringify(treeData));
-        //     oActionContext.setParameter("poHeader", treeData);
-        //     try{
-        //         var oResults=await oActionContext.execute()
-        //         treeData=oActionContext.getBoundContext().getObject().value[0]?.data
-        //         console.log(oResults)
-        //     }catch(oError){
-        //         console.log(oError)
-        //     }
-        //     var flatExcelData = this.transformTreeToFlatData(treeData);
-        //     var sGeneratedMsg=this.getChangeSummary(this.aOldData,treeData)
-
-        //     var aCols = [
-        //         // Level 1
-        //         { label: 'Vendor Code', property: 'VendorCode', type: 'string' },
-        //         { label: 'Vendor name', property: 'VendorName', type: 'string' },
-        //         { label: 'PO Number', property: 'PONumber', type: 'string' },
-        //         { label: 'PO date', property: 'PODate', type: 'string' },
-        //         // Level 2
-        //         { label: 'PO Line Item', property: 'POLineItem', type: 'string' },
-        //         { label: 'Material', property: 'Material', type: 'string' },
-        //         { label: 'Material Description', property: 'MaterialDesc', type: 'string' },
-        //         { label: 'PO Quantity', property: 'POQuantity', type: 'string' },
-        //         { label: 'Unit of Measure', property: 'UOM', type: 'string' },
-        //         { label: 'Delivery Date', property: 'DeliveryDate', type: 'string' },
-        //         { label: 'Net Price', property: 'NetPrice', type: 'string' },
-        //         { label: 'Currency', property: 'Currency', type: 'string' },
-        //         { label: 'Per', property: 'Per', type: 'string' },
-        //         { label: 'Material Group', property: 'MaterialGroup', type: 'string' },
-        //         { label: 'Plant', property: 'Plant', type: 'string' },
-        //         { label: 'Storage Location', property: 'StorageLocation', type: 'string' },
-        //         // Level 3
-        //         { label: 'Confirmation category', property: 'ConfirmationCategory', type: 'string' },
-        //         { label: 'Delivery Date Category', property: 'FDDCategory', type: 'string' },
-        //         { label: 'Quantity', property: 'Quantity', type: 'string' },
-        //         { label: 'Reference', property: 'Reference', type: 'string' },
-        //         { label: 'Created on Date', property: 'CreationDate', type: 'string' },
-        //         { label: 'Inbound Delivery', property: 'InboundDelivery', type: 'string' },
-        //         { label: 'Item', property: 'Item', type: 'string' },
-        //         { label: 'Higher Level Item', property: 'HLItem', type: 'string' },
-        //         { label: 'Batch', property: 'Batch', type: 'string' },
-        //         { label: 'Quantity Reduced', property: 'QtyReduced', type: 'string' },
-        //         { label: 'MRP relevant', property: 'MRPRelevant', type: 'string' },
-        //         { label: 'MPN Material', property: 'MRPMaterial', type: 'string' },
-        //         { label: 'Creation Indicator', property: 'CreationIndicator', type: 'string' },
-        //         { label: 'Sequence Number', property: 'SequenceNumber', type: 'string' },
-        //         { label: 'Status', property: 'StatusFlag', type: 'string' },
-        //         { label: 'Comment', property: 'RejectReason', type: 'string' },
-        //         { label: 'Qlik Qty', property: 'QlikQty', type: 'string' },
-        //         { label: 'Qlik Date', property: 'QlikDate', type: 'string' },
-        //         { label: 'Rejection Date', property: 'ActionDate', type: 'string' },
-        //         { label: 'Email Flag', property: 'EmailFlag', type: 'string' },
-        //         { label: 'EDI Flag', property: 'EDIFlag', type: 'string' },
-        //         // Level 4
-        //     ];
-        //     // 3. Configure and start the export
-        //     var dNewDate=new Date().toLocaleString()
-        //     var sFileName=`BTP_Harman_POC_Template_${dNewDate}.xlsx`
-        //     var oSettings = {
-        //         workbook: { columns: aCols },
-        //         dataSource: flatExcelData,
-        //         fileName: sFileName
-        //     };
-
-        //     if(sGeneratedMsg.includes("No changes to save")){
-                
-        //     }else{
-        //         var oSheet = new Spreadsheet(oSettings);
-        //         oSheet.build().finally(function () {
-        //             oSheet.destroy();
-        //         });
-        //     }
-
-        //     // this.aOldData=JSON.parse(JSON.stringify(treeData));
-        //     this.onGenSaveMessage(sGeneratedMsg,treeData)
-        // },
         onSaveTemplate: async function (oEvent) {
     // 1. Fetch data directly from your master dataset array, ensuring all 19 rows are caught
     // even if the user is currently looking at a filtered set of 3 rows!
@@ -920,48 +557,47 @@ sap.ui.define([
     }
 
     // Convert the full 19-record set into spreadsheet flat rows
-    var flatExcelData = this.transformTreeToFlatData(treeData);
+    var flatExcelData = treeData;
     var sGeneratedMsg = this.getChangeSummary(this.aOldData, treeData);
 
     var aCols = [
-        { label: 'Vendor Code', property: 'VendorCode', type: 'string' },
-        { label: 'Vendor name', property: 'VendorName', type: 'string' },
-        { label: 'PO Number', property: 'PONumber', type: 'string' },
-        { label: 'PO date', property: 'PODate', type: 'string' },
-        { label: 'PO Line Item', property: 'POLineItem', type: 'string' },
-        { label: 'Material', property: 'Material', type: 'string' },
-        { label: 'Material Description', property: 'MaterialDesc', type: 'string' },
-        { label: 'PO Quantity', property: 'POQuantity', type: 'string' },
-        { label: 'Unit of Measure', property: 'UOM', type: 'string' },
-        { label: 'Delivery Date', property: 'DeliveryDate', type: 'string' },
-        { label: 'Net Price', property: 'NetPrice', type: 'string' },
-        { label: 'Currency', property: 'Currency', type: 'string' },
-        { label: 'Per', property: 'Per', type: 'string' },
-        { label: 'Material Group', property: 'MaterialGroup', type: 'string' },
-        { label: 'Plant', property: 'Plant', type: 'string' },
-        { label: 'Storage Location', property: 'StorageLocation', type: 'string' },
-        { label: 'Confirmation category', property: 'ConfirmationCategory', type: 'string' },
-        { label: 'Delivery Date Category', property: 'FDDCategory', type: 'string' },
-        { label: 'Quantity', property: 'Quantity', type: 'string' },
-        { label: 'Reference', property: 'Reference', type: 'string' },
-        { label: 'Created on Date', property: 'CreationDate', type: 'string' },
-        { label: 'Inbound Delivery', property: 'InboundDelivery', type: 'string' },
-        { label: 'Item', property: 'Item', type: 'string' },
-        { label: 'Higher Level Item', property: 'HLItem', type: 'string' },
-        { label: 'Batch', property: 'Batch', type: 'string' },
-        { label: 'Quantity Reduced', property: 'QtyReduced', type: 'string' },
-        { label: 'MRP relevant', property: 'MRPRelevant', type: 'string' },
-        { label: 'MPN Material', property: 'MRPMaterial', type: 'string' },
-        { label: 'Creation Indicator', property: 'CreationIndicator', type: 'string' },
-        { label: 'Sequence Number', property: 'SequenceNumber', type: 'string' },
-        { label: 'Status', property: 'StatusFlag', type: 'string' },
-        { label: 'Comment', property: 'RejectReason', type: 'string' },
-        { label: 'Qlik Qty', property: 'QlikQty', type: 'string' },
-        { label: 'Qlik Date', property: 'QlikDate', type: 'string' },
-        { label: 'Action Date', property: 'ActionDate', type: 'string' },
-        { label: 'Email Flag', property: 'EmailFlag', type: 'string' },
-        { label: 'EDI Flag', property: 'EDIFlag', type: 'string' }
-    ];
+            { label: 'ODM', property: 'ODM', type: 'string' },
+            { label: 'Factory site', property: 'FactorySite', type: 'string' },
+            { label: 'vendor code', property: 'VendorCode', type: 'string' },
+            { label: 'Region', property: 'Region', type: 'string' },
+            { label: 'Plant', property: 'Plant', type: 'string' },
+            { label: 'Project', property: 'Project', type: 'string' },
+            { label: 'SKU', property: 'Material', type: 'string' },
+            { label: 'PO#', property: 'PONumber', type: 'string' },
+            { label: 'Item', property: 'Item', type: 'string' },
+            { label: 'Balance', property: 'Balance', type: 'string' },
+            { label: 'Doc date', property: 'PODate', type: 'string' },
+            { label: 'Statistical delivery date', property: 'StatDelDate', type: 'string' },
+            { label: 'Initial dates:', property: 'InitialDates', type: 'string' },
+            { label: 'ODM CRD Mar 19', property: 'ODMCRDMar19', type: 'string' },
+            { label: 'ODM Remark', property: 'ODMRemark', type: 'string' },
+            { label: 'Harman Remark', property: 'HarmanRemark', type: 'string' },
+            { label: 'Curr#', property: 'Currency', type: 'string' },
+            { label: 'PO U/P', property: 'NetPrice', type: 'string' },
+            { label: 'Order Status', property: 'ConfirmationCategory', type: 'string' },
+            { label: 'Shipping mode', property: 'ShippingMode', type: 'string' },
+            { label: 'Booking#', property: 'Booking', type: 'string' },
+            { label: 'Ex-factory/CRD', property: 'ExFtCRD', type: 'string' },
+            { label: 'Remark/Customer APAC', property: 'RemarkCustomerAPAC', type: 'string' },
+            { label: 'Harman request Jun 7th', property: 'HarmanReqDate', type: 'string' },
+            { label: 'ODM feedback Jun 10th', property: 'ODMFeedback', type: 'string' },
+            { label: 'Seq Num', property: 'SequenceNumber', type: 'string' },
+            { label: 'PO Qty', property: 'POQuantity', type: 'string' },
+            { label: 'Qlik Qty', property: 'QlikQty', type: 'string' },
+            { label: 'Qlik Date', property: 'QlikDate', type: 'string' },
+            { label: 'Action Date', property: 'ActionDate', type: 'string' },
+            { label: 'Email Flag', property: 'EmailFlag', type: 'string' },
+            { label: 'EDI Flag', property: 'EDIFlag', type: 'string' },
+            { label: 'Conf. Status', property: 'StatusFlag', type: 'string' },
+            { label: 'Comment', property: 'RejectReason', type: 'string' },
+            
+        ];
+
 
     var dNewDate = new Date().toLocaleString().replace(/[/\\:,]/g, "-");
     var sFileName = `BTP_Harman_POC_Template_${dNewDate}.xlsx`;
@@ -981,7 +617,6 @@ sap.ui.define([
     this.onGenSaveMessage(sGeneratedMsg, treeData);
 },
         onGenSaveMessage: function (sMsg,treeData) {
-            var that=this
 			MessageBox.success(sMsg, {
 				actions: [MessageBox.Action.OK],
 				emphasizedAction: MessageBox.Action.OK,
@@ -1089,8 +724,8 @@ sap.ui.define([
 
             // 1. Navigate to Parent Delivery Date
             const sPath = oContext.getPath();
-            const sParentPath = sPath.substring(0, sPath.lastIndexOf("/children/"));
-            const sParentDateStr = oModel.getProperty(sParentPath + "/DeliveryDate");
+            // const sParentPath = sPath.substring(0, sPath.lastIndexOf("/children/"));
+            const sParentDateStr = oModel.getProperty(sPath + "/DeliveryDate");
 
             const dParent = new Date(sParentDateStr);
             const dChild = new Date(sNewDateValue);
@@ -1106,74 +741,6 @@ sap.ui.define([
             // 4. Update the Model
             oModel.setProperty(sPath + "/DateState", sState);
             oModel.setProperty(sPath + "/DateMsg", sMsg);
-        },
-
-        transformTreeToFlatData:function(treeData) {
-            const flatData = [];
-            // Loop through Level 1 (The PO / Vendor groups)
-            treeData.forEach(groupNode => {
-                // Extract the parent-level data
-                const poNumber = groupNode.PONumber;
-                const vendorCode = groupNode.VendorCode;
-                const vendorName = groupNode.VendorName;
-                const poDate = groupNode.PODate;
-                // Check if this group has children (Level 2 Line Items)
-                if (groupNode.children && groupNode.children.length > 0) {
-                    // Loop through Level 2
-                    groupNode.children.forEach(itemNode => {
-                        if (itemNode.children && itemNode.children.length > 0) {
-                            // Loop through Level 3
-                            itemNode.children.forEach(subItemNode => {
-                                const flatRow = {
-                                    PONumber: poNumber,
-                                    VendorCode: vendorCode,
-                                    VendorName: vendorName,
-                                    PODate:poDate,
-                                    //Level 2 Start
-                                    POLineItem: itemNode.POLineItem,
-                                    Material: itemNode.Material,
-                                    MaterialDesc: itemNode.MaterialDesc,
-                                    POQuantity: itemNode.POQuantity,
-                                    UOM: itemNode.UOM,
-                                    DeliveryDate: itemNode.DeliveryDate,
-                                    NetPrice: itemNode.NetPrice,
-                                    Currency: itemNode.Currency,
-                                    Per: itemNode.Per,
-                                    MaterialGroup:itemNode.MaterialGroup,
-                                    Plant : itemNode.Plant,
-                                    StorageLocation : itemNode.StorageLocation,
-                                    //Level 3 Start
-                                    ConfirmationCategory:subItemNode.ConfirmationCategory,
-                                    FDDCategory:subItemNode.FDDCategory,
-                                    Quantity: subItemNode.Quantity,
-                                    Reference: subItemNode.Reference,
-                                    CreationDate: subItemNode.CreationDate,
-                                    InboundDelivery: subItemNode.InboundDelivery,
-                                    Item: subItemNode.Item,
-                                    HLItem: subItemNode.HLItem,
-                                    Batch: subItemNode.Batch,
-                                    QtyReduced: subItemNode.QtyReduced,
-                                    MRPRelevant: subItemNode.MRPRelevant,
-                                    MRPMaterial: subItemNode.MRPMaterial,
-                                    CreationIndicator: subItemNode.CreationIndicator,
-                                    SequenceNumber: subItemNode.SequenceNumber,
-
-                                    StatusFlag:subItemNode.StatusFlag,
-                                    RejectReason:subItemNode.RejectReason,
-                                    ActionDate:subItemNode.ActionDate, 
-                                    QlikQty: subItemNode.QlikQty,
-                                    QlikDate: subItemNode.QlikDate,
-                                    EmailFlag: subItemNode.EmailFlag,
-                                    EDIFlag: subItemNode.EDIFlag
-                                };
-                                flatData.push(flatRow);
-                            });
-                        }
-                    });
-                }
-            });
-
-            return flatData;
         },
 
         onShowExpanded:function(oEvent){
@@ -1192,8 +759,6 @@ sap.ui.define([
                 }
             }
             this.convertLIFlag(true)
-            var that = this;
-            setTimeout(function () { that._patchL3ScrollDom(); }, 150);
         },
         convertLIFlag:function(bFlag){
             this.lineItemFlag=bFlag
@@ -1229,88 +794,141 @@ sap.ui.define([
                 this.prevRecord = oCurrentItem;
             }
             this.convertSubLIFlag(true)
-            // Patch L3 scroll DOM after SAP renders the new L3 content
-            var that = this;
-            setTimeout(function () { that._patchL3ScrollDom(); }, 150);
         },
         onAddVendorRowSP: function (oEvent) {
-            this.convertLIFlag(false)
-            this.convertSubLIFlag(false)
+            this.convertLIFlag(false);
+            this.convertSubLIFlag(false);
+            
             var oButton = oEvent.getSource();
             var oContext = oButton.getBindingContext("excelModel");
             var oModel = this.getOwnerComponent().getModel("excelModel");
-            this.sCurrentPath = oContext.getPath() + "/children"
-            var aVendorInputTable=oModel.getProperty(this.sCurrentPath)
-            var iSNum;
-            var oVendorObject;
-            if(aVendorInputTable.length!=0){
-                oVendorObject=aVendorInputTable[0]
-                var iMaxTabLength=aVendorInputTable.length
-                var iMaxSN=aVendorInputTable[iMaxTabLength-1].SequenceNumber
-                iSNum=(Number(iMaxSN)+1).toString()
-            }else{
-                oVendorObject={}
-                iSNum=1
-            }
-            aVendorInputTable.push({
-                // LineItemNumber: iLINumber,
-                ConfirmationCategory:oVendorObject?.ConfirmationCategory,
-                FDDCategory:oVendorObject?.FDDCategory,
+            
+            this.sCurrentPath = oContext.getPath();
+            var oPOConfTable = oModel.getProperty('/data');
+            var oVendorObject = oModel.getProperty(this.sCurrentPath);
+
+            var sTargetPO = oContext.getObject().PONumber;
+            var sTargetItem = oContext.getObject().Item;
+
+            // 1. Find max sequence number
+            const oFConfTable = oPOConfTable
+                .filter(row => row.PONumber === sTargetPO && row.Item === sTargetItem)
+                .map(row => Number(row.SequenceNumber));
+                
+            const maxSequence = oFConfTable.length > 0 ? Math.max(...oFConfTable) : 0;
+            console.log(`Max Sequence Number for Item ${sTargetItem}:`, maxSequence);
+
+            const iNewSNum = (maxSequence + 1).toString();
+
+            // 2. Build the new row object
+            var oPushConfItem = {
+                // Level 1
+                VendorCode: oVendorObject.VendorCode,
+                ODM: oVendorObject.ODM,
+                FactorySite: oVendorObject.FactorySite,
+                Region: oVendorObject.Region,
+                Project: oVendorObject.Project,
+                PONumber: oVendorObject.PONumber,
+                PODate: oVendorObject.PODate,
+
+                // Level 2
+                StatDelDate: oVendorObject.StatDelDate,
+                InitialDates: oVendorObject.InitialDates,
+                ODMCRDMar19: oVendorObject.ODMCRDMar19,
+                ODMRemark: oVendorObject.ODMRemark,
+                HarmanRemark: oVendorObject.HarmanRemark,
+                Material: oVendorObject.Material,
+                POQuantity: oVendorObject.POQuantity,
+                NetPrice: oVendorObject.NetPrice,
+                Currency: oVendorObject.Currency,
+                Balance: oVendorObject.Balance,
+                Plant: oVendorObject.Plant,
+
+                // Level 3
+                ConfirmationCategory: oVendorObject.ConfirmationCategory,
+                ShippingMode: oVendorObject.ShippingMode,
+                Booking: oVendorObject.Booking,
+                ExFtCRD: oVendorObject.ExFtCRD,
+                RemarkCustomerAPAC: oVendorObject.RemarkCustomerAPAC,
+                HarmanReqDate: oVendorObject.HarmanReqDate,
+                ODMFeedback: oVendorObject.ODMFeedback,
+                Item: oVendorObject.Item,
+                SequenceNumber: iNewSNum,
+                StatusFlag: oVendorObject.StatusFlag,
+                RejectReason: oVendorObject.RejectReason,
+                ActionDate: oVendorObject.ActionDate,
+                EmailFlag: oVendorObject.EmailFlag,   
+                EDIFlag: oVendorObject.EDIFlag,  
+                QlikQty: oVendorObject.QlikQty,
+                QlikDate: oVendorObject.QlikDate,
                 Quantity: "0",
-                Reference: oVendorObject?.Reference,
                 CreationDate: oVendorObject?.CreationDate,
-                InboundDelivery: oVendorObject?.InboundDelivery,
-                Item:oVendorObject?.Item,
-                HLItem: oVendorObject?.HLItem,
-                Batch: oVendorObject?.Batch,
-                QtyReduced: oVendorObject?.QtyReduced,
-                MRPRelevant: oVendorObject?.MRPRelevant,
-                MRPMaterial: oVendorObject?.MRPMaterial,
-                CreationIndicator: oVendorObject?.CreationIndicator,
-                SequenceNumber: iSNum,
-                newRecFlag:true,
-                DateMsg:oVendorObject?.DateMsg,
-                DateState:oVendorObject?.DateState,
-                QlikDate: oVendorObject?.QlikDate,
-                QlikQty:oVendorObject?.QlikQty,
-                EmailFlag:""
-            });
-            oModel.setProperty(this.sCurrentPath, aVendorInputTable);
+                newRecFlag: true,
+                DateState: "None", 
+                DateMsg: ""        
+            };
+
+            // Option A: If your table handles sorting automatically via JSONModel bindings, push is fine:
+            // oPOConfTable.push(oPushConfItem);
+
+            // Option B (Recommended): Insert the new row directly below the currently clicked row
+            var sCurrentIndex = parseInt(this.sCurrentPath.split("/").pop(), 10);
+            if (!isNaN(sCurrentIndex)) {
+                oPOConfTable.splice(sCurrentIndex + 1, 0, oPushConfItem);
+            } else {
+                oPOConfTable.push(oPushConfItem); // Fallback
+            }
+
+            // 3. CRITICAL: Update model property path correctly and refresh the model
+            oModel.setProperty('/data', oPOConfTable);
+            oModel.refresh(true); // Forces UI components bound to this model to re-render
         },
         onDeleteVendorTreeRow: function (oEvent) {
-            // 1. Store the context and data you need before opening the MessageBox
-            // (In some cases, oEvent.getSource() might be lost if accessed inside the callback)
             var oModel = this.getOwnerComponent().getModel("excelModel");
+            
+            // This will now successfully retrieve the context passed via the ActionSheet
             var oContext = oEvent.getSource().getBindingContext("excelModel");
+            if (!oContext) {
+                sap.m.MessageToast.show("Error: Could not determine the selected row context.");
+                return;
+            }
+            
             var sPath = oContext.getPath();
             
-            // 2. Open the Confirmation Dialog
             sap.m.MessageBox.confirm("Are you sure you want to delete this item?", {
                 title: "Confirm Deletion",
                 onClose: function (oAction) {
-                    // 3. Only proceed if the user clicked 'OK'
                     if (oAction === sap.m.MessageBox.Action.OK) {
                         
                         this.convertLIFlag(false);
                         this.convertSubLIFlag(false);
 
-                        // Find the last slash to separate the index from the parent path
+                        // Find parent path and index
                         var iLastSlashIndex = sPath.lastIndexOf("/");
                         var sParentPath = sPath.substring(0, iLastSlashIndex);
-                        var iIndex = sPath.substring(iLastSlashIndex + 1);
-
-                        // Get the actual array from the model
+                        var sIndex = sPath.substring(iLastSlashIndex + 1);
+                        
+                        // For ui.table / Tree structures, handles named property structures vs arrays safely
                         var aParentCollection = oModel.getProperty(sParentPath);
+                        var iIndex = parseInt(sIndex, 10);
 
-                        // Remove the item directly from the model's data
-                        if (Array.isArray(aParentCollection)) {
+                        if (Array.isArray(aParentCollection) && !isNaN(iIndex)) {
+                            // Remove the item from JSON array
                             aParentCollection.splice(iIndex, 1);
                             oModel.refresh(true);
                             
                             sap.m.MessageToast.show("Item deleted successfully");
+                        } else if (aParentCollection && typeof aParentCollection === 'object' && isNaN(iIndex)) {
+                            // Fallback for named object paths if ui.table is using object-based node mapping
+                            delete aParentCollection[sIndex];
+                            oModel.refresh(true);
+                            
+                            sap.m.MessageToast.show("Item deleted successfully");
+                        } else {
+                            sap.m.MessageToast.show("Error: Unable to modify data source.");
                         }
                     }
-                }.bind(this) // Crucial: bind 'this' so you can still access this.convertLIFlag
+                }.bind(this)
             });
         },
         onRejectVendorTreeRow: function (oEvent) {
@@ -1457,38 +1075,8 @@ sap.ui.define([
             let updatedCount = 0;
             let addedCount = 0;
 
-            // Helper to flatten the nested children into a simple array of records
-            const flatten = (data) => {
-                let results = [];
-                data.forEach(parent => {
-                    parent.children.forEach(lineItem => {
-                        lineItem.children.forEach(record => {
-                            results.push(record);
-                        });
-                    });
-                });
-                return results;
-            };
-
-
-            const flattenReset = (data) => {
-                let results = [];
-                data.forEach(parent => {
-                    // Ensure children exist to avoid errors
-                    parent.children?.forEach(lineItem => {
-                        lineItem.children?.forEach(record => {
-                            // Set the property to false
-                            record.newRecFlag = false; 
-                            
-                            results.push(record);
-                        });
-                    });
-                });
-                return results;
-            };
-
-            const oldRecords = flattenReset(originalData);
-            const newRecords = flatten(currentData);
+            const oldRecords = originalData;
+            const newRecords = currentData ;
 
             newRecords.forEach(newRec => {
                 // 1. Check if it's a brand new record
@@ -1500,7 +1088,7 @@ sap.ui.define([
                     // const oldRec = oldRecords.find(r => r.SequenceNumber === newRec.SequenceNumber);
                     const oldRec = oldRecords.find(r =>   
                         r.SequenceNumber == newRec.SequenceNumber &&
-                        r.POLineItem     == newRec.POLineItem     &&
+                        r.Item     == newRec.Item     &&
                         r.VendorCode     == newRec.VendorCode     &&
                         r.PONumber       == newRec.PONumber
                     )
@@ -1533,8 +1121,8 @@ sap.ui.define([
         },
         handlePopoverPress: function (oEvent) {
              this.convertLIFlag(false);
-            this.convertSubLIFlag(false)
-            var oButton = oEvent.getSource(),
+            this.convertSubLIFlag(false);
+            var oButton = this.oCurrBtn,
                 oView = this.getView(),
                 // Capture the specific row context from the clicked button
                 oContext = oButton.getBindingContext("excelModel");
@@ -1560,7 +1148,7 @@ sap.ui.define([
         handleQlikPopoverPress: function (oEvent) {
              this.convertLIFlag(false);
             this.convertSubLIFlag(false)
-            var oButton = oEvent.getSource(),
+            var oButton = that.oCurrBtn,
                 oView = this.getView(),
                 // Capture the specific row context from the clicked button
                 oContext = oButton.getBindingContext("excelModel");
