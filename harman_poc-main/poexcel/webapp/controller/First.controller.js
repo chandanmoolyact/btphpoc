@@ -27,14 +27,7 @@ sap.ui.define([
             
         },
         onAfterRendering: function () {
-            // this.oAdaptFilterBtn=sap.ui.getCore().byId("container-com.sap.poexcel---First--idTreeFilterBar-btnFilters-content")
-            // this.oAdaptFilterBtn.setVisible(false)
         },
-        // onActionButtonPress: function (oEvent) {
-        //     var oButton = oEvent.getSource();
-		// 	this.byId("actionSheet").openBy(oButton);
-        // },
-
         onActionButtonPress: function (oEvent) {
                 var oButton = oEvent.getSource();
                 that.oCurrBtn=oButton;
@@ -173,110 +166,116 @@ sap.ui.define([
         //Filter Bar Logic Start
 
        onSearchFilterBar: function () {
-    var oModel = this.getView().getModel("excelModel");
-    
-    // 1. Keep a pristine copy of your original dataset (Only once on initial load)
-    if (!this._oOriginalData) {
-        this._oOriginalData = JSON.parse(JSON.stringify(oModel.getProperty("/data")));
-    }
+            var oModel = this.getView().getModel("excelModel");
+            
+            // 1. Keep a pristine copy of your original dataset (Only once on initial load)
 
-    // 2. Extract active filter criteria from the FilterBar
-    var oActiveFilters = {};
-    this.oFilterBar.getFilterGroupItems().forEach(function (oItem) {
-        var oControl = oItem.getControl();
-        var sName = oItem.getName();
-        var sClassName = oControl.getMetadata().getName();
-        
-        if (sClassName === "sap.m.DateRangeSelection") {
-            var oDateStart = oControl.getDateValue();
-            var oDateEnd = oControl.getSecondDateValue();
-            if (oDateStart && oDateEnd) {
-                var oStart = new Date(oDateStart); oStart.setHours(0,0,0,0);
-                var oEnd = new Date(oDateEnd); oEnd.setHours(23,59,59,999);
-                oActiveFilters[sName] = { isDateRange: true, start: oStart.getTime(), end: oEnd.getTime() };
+            var sExcelUploaderValue = this.byId("excelUploader")?.mProperties?.value;
+            if(!sExcelUploaderValue){
+                return ""
             }
-        } 
-        else if (sClassName === "sap.m.ComboBox") {    
-            var sSelectedKey = oControl.getSelectedKey();
-            if (sSelectedKey && sSelectedKey !== "") {        
-                oActiveFilters[sName] = { isSelectKey: true, value: sSelectedKey.trim() };
+
+            if (!this._oOriginalData) {
+                this._oOriginalData = JSON.parse(JSON.stringify(oModel.getProperty("/data")));
             }
-        } 
-        else {
-            var sValue = oControl.getValue ? oControl.getValue() : null;
-            if (sValue) {
-                oActiveFilters[sName] = sValue.toLowerCase().trim();
-            }
-        }
-    });
 
-    var aFilterKeys = Object.keys(oActiveFilters);
-
-    // If no filters are filled out, instantly restore original tree and exit
-    if (aFilterKeys.length === 0) {
-        oModel.setProperty("/data", JSON.parse(JSON.stringify(this._oOriginalData)));
-        return;
-    }
-
-    // 3. Deep evaluation function maintaining exact object reference links to _oOriginalData
-    function evaluateAndFilterTree(aNodes, aPendingKeys) {
-        if (!aNodes || aNodes.length === 0) { return []; }
-
-        return aNodes.map(function (oNode) {
-            // CRITICAL: Shallow copy structural tracking keys, but retain direct memory linkage to data properties
-            var oClonedNode = Object.assign({}, oNode);
-
-            // Check which of the remaining filter keys match the current node level
-            var aMatchedKeysAtThisLevel = aPendingKeys.filter(function (sKey) {
-                var filterConfig = oActiveFilters[sKey];
-                var nodeValue = oNode[sKey]; // Evaluated directly against the source object reference
+            // 2. Extract active filter criteria from the FilterBar
+            var oActiveFilters = {};
+            this.oFilterBar.getFilterGroupItems().forEach(function (oItem) {
+                var oControl = oItem.getControl();
+                var sName = oItem.getName();
+                var sClassName = oControl.getMetadata().getName();
                 
-                if (nodeValue === undefined || nodeValue === null) { return false; }
-
-                if (filterConfig && filterConfig.isDateRange) {
-                    var oNodeDate = new Date(nodeValue);
-                    if (isNaN(oNodeDate.getTime())) { return false; }
-                    return oNodeDate.getTime() >= filterConfig.start && oNodeDate.getTime() <= filterConfig.end;
+                if (sClassName === "sap.m.DateRangeSelection") {
+                    var oDateStart = oControl.getDateValue();
+                    var oDateEnd = oControl.getSecondDateValue();
+                    if (oDateStart && oDateEnd) {
+                        var oStart = new Date(oDateStart); oStart.setHours(0,0,0,0);
+                        var oEnd = new Date(oDateEnd); oEnd.setHours(23,59,59,999);
+                        oActiveFilters[sName] = { isDateRange: true, start: oStart.getTime(), end: oEnd.getTime() };
+                    }
+                } 
+                else if (sClassName === "sap.m.ComboBox") {    
+                    var sSelectedKey = oControl.getSelectedKey();
+                    if (sSelectedKey && sSelectedKey !== "") {        
+                        oActiveFilters[sName] = { isSelectKey: true, value: sSelectedKey.trim() };
+                    }
+                } 
+                else {
+                    var sValue = oControl.getValue ? oControl.getValue() : null;
+                    if (sValue) {
+                        oActiveFilters[sName] = sValue.toLowerCase().trim();
+                    }
                 }
-
-                if (filterConfig && filterConfig.isSelectKey) {
-                    return String(nodeValue).trim() === filterConfig.value;
-                }
-
-                return String(nodeValue).toLowerCase().includes(filterConfig);
             });
 
-            // Calculate remaining filter keys
-            var aRemainingKeys = aPendingKeys.filter(function (sKey) {
-                return !aMatchedKeysAtThisLevel.includes(sKey);
-            });
+            var aFilterKeys = Object.keys(oActiveFilters);
 
-            // If this node has sub-items (children), dig deeper
-            if (oNode.children && oNode.children.length > 0) {
-                var aFilteredChildren = evaluateAndFilterTree(oNode.children, aRemainingKeys);
-                
-                if (aFilteredChildren.length > 0) {
-                    oClonedNode.children = aFilteredChildren;
-                    oClonedNode.PanelVisible = true;
-                    oClonedNode.NextPanelVisible = true;
-                    return oClonedNode;
-                }
+            // If no filters are filled out, instantly restore original tree and exit
+            if (aFilterKeys.length === 0) {
+                oModel.setProperty("/data", JSON.parse(JSON.stringify(this._oOriginalData)));
+                return;
             }
 
-            // If no children left, check if all active filters were cleared along this line
-            if (aRemainingKeys.length === 0) {
-                // Ensure adjustments made to oClonedNode map back directly to the real reference item
-                return oNode; 
+            // 3. Deep evaluation function maintaining exact object reference links to _oOriginalData
+            function evaluateAndFilterTree(aNodes, aPendingKeys) {
+                if (!aNodes || aNodes.length === 0) { return []; }
+
+                return aNodes.map(function (oNode) {
+                    // CRITICAL: Shallow copy structural tracking keys, but retain direct memory linkage to data properties
+                    var oClonedNode = Object.assign({}, oNode);
+
+                    // Check which of the remaining filter keys match the current node level
+                    var aMatchedKeysAtThisLevel = aPendingKeys.filter(function (sKey) {
+                        var filterConfig = oActiveFilters[sKey];
+                        var nodeValue = oNode[sKey]; // Evaluated directly against the source object reference
+                        
+                        if (nodeValue === undefined || nodeValue === null) { return false; }
+
+                        if (filterConfig && filterConfig.isDateRange) {
+                            var oNodeDate = new Date(nodeValue);
+                            if (isNaN(oNodeDate.getTime())) { return false; }
+                            return oNodeDate.getTime() >= filterConfig.start && oNodeDate.getTime() <= filterConfig.end;
+                        }
+
+                        if (filterConfig && filterConfig.isSelectKey) {
+                            return String(nodeValue).trim() === filterConfig.value;
+                        }
+
+                        return String(nodeValue).toLowerCase().includes(filterConfig);
+                    });
+
+                    // Calculate remaining filter keys
+                    var aRemainingKeys = aPendingKeys.filter(function (sKey) {
+                        return !aMatchedKeysAtThisLevel.includes(sKey);
+                    });
+
+                    // If this node has sub-items (children), dig deeper
+                    if (oNode.children && oNode.children.length > 0) {
+                        var aFilteredChildren = evaluateAndFilterTree(oNode.children, aRemainingKeys);
+                        
+                        if (aFilteredChildren.length > 0) {
+                            oClonedNode.children = aFilteredChildren;
+                            oClonedNode.PanelVisible = true;
+                            oClonedNode.NextPanelVisible = true;
+                            return oClonedNode;
+                        }
+                    }
+
+                    // If no children left, check if all active filters were cleared along this line
+                    if (aRemainingKeys.length === 0) {
+                        // Ensure adjustments made to oClonedNode map back directly to the real reference item
+                        return oNode; 
+                    }
+
+                    return null;
+                }).filter(Boolean);
             }
 
-            return null;
-        }).filter(Boolean);
-    }
-
-    // Pass the master data directly to preserve pointer linkages
-    var aFilteredData = evaluateAndFilterTree(this._oOriginalData, aFilterKeys);
-    oModel.setProperty("/data", aFilteredData);
-},
+            // Pass the master data directly to preserve pointer linkages
+            var aFilteredData = evaluateAndFilterTree(this._oOriginalData, aFilterKeys);
+            oModel.setProperty("/data", aFilteredData);
+        },
 
         // Triggered when a file is selected via the FileUploader
         onFileChange: function (oEvent) {
@@ -383,70 +382,6 @@ sap.ui.define([
                         var year = d.getUTCFullYear();
                         return month + "/" + day + "/" + year;
                     };
-                    // return {
-                    //     //Level 1 Start
-                    //     VendorCode: row["Vendor Code"]||row["vendor code"],
-                    //     ODM:row["ODM"],
-                    //     FactorySite:row["Factory site"],
-                    //     Region:row["Region"],
-                    //     Project:row["Project"],
-                    //     VendorName: row["Vendor Name"]||row["Vendor name"],
-                    //     PONumber: row["PO Number"] || row["PONumber"]||row["PO#"],
-                    //     PODate: formatDate(row["PO date"])||formatDate(row["Doc date"]),
-                    //     PanelVisible:false,
-                    //     //Level 2 Start
-                    //     StatDelDate: row["Statistical delivery date"]||row["Statistical Delivery Date"],
-                    //     InitialDates: row["Initial dates:"]||row["Initial dates:"],
-                    //     ODMCRDMar19: row["ODM CRD Mar 19"]||row["ODM CRD Mar 19"],
-                    //     ODMRemark: row["ODM Remark"]||row["ODM Remark"],
-                    //     HarmanRemark: row["Harman Remark"]||row["Harman Remark"],
-                    //     POLineItem: row["PO Line Item"] || row["LineItem"],
-                    //     Material: row["Material"]||row["SKU"],
-                    //     MaterialDesc: row["Material Description"],
-                    //     POQuantity: row["PO Qty"]||row["PO Quantity"],
-                    //     UOM: row["Unit of Measure"],
-                    //     DeliveryDate: formatDate(row["Delivery Date"]) ||formatDate(row["Harman request Jun 7th"]),
-                    //     NetPrice: row["Net Price"]||row["PO U/P"],
-                    //     Currency: row["Currency"]||row["Curr#"],
-                    //     Balance: row["Balance"],
-                    //     Per: row["Per"],
-                    //     MaterialGroup: row["Material Group"],
-                    //     Plant : row["Plant"],
-                    //     StorageLocation : row["Storage Location"],
-                    //     //Level 3 Start
-                    //     ConfirmationCategory:row["Confirmation category"]||row["Order Status"],
-                    //     ShippingMode:row["Shipping mode"]||row["Shipping Mode"]||row[" Shipping mode "],
-                    //     FDDCategory: row["Fdelivery Date category"] || row["FDelivery Date Category"] || row["Delivery Date Category"],
-                    //     Quantity: row["Quantity"],
-                    //     Booking: row["Booking#"],
-                    //     ExFtCRD: row["Ex-factory/CRD"],
-                    //     RemarkCustomerAPAC: row["Remark/Customer APAC"],
-                    //     HarmanReqDate: row["Harman request Jun 7th"],
-                    //     ODMFeedback: row["ODM feedback Jun 10th"],
-                    //     // 
-                    //     Reference: row["Reference"],
-                    //     CreationDate: formatDate(row["Created on Date"]),
-                    //     InboundDelivery: row["Inbound Delivery"],
-                    //     Item: row["Item"],
-                    //     HLItem: row["Higher Level Item"],
-                    //     Batch: row["Batch"],
-                    //     QtyReduced: row["Quantity Reduced"],
-                    //     MRPRelevant: row["MRP relevant"]||row["MRP Relevent"],
-                    //     MRPMaterial: row["MPN Material"]||row["MPN material"],
-                    //     CreationIndicator: row["Creation Indicator"]||row["Creation Indicator"],
-                    //     SequenceNumber: row["Sequence Number"]||row["Sequence number"]||row["Seq Num"],
-                    //     StatusFlag: row["Status"],
-                    //     RejectReason: row["Comment"],
-                    //     ActionDate: formatDate(row["Action Date"]),
-                    //     EmailFlag: row["Email Flag"]||row["EmailFlag"],   
-                    //     EDIFlag: row["EDI Flag"]||row["EDIFlag"],  
-                    //     QlikQty: row["Qlik Qty"] || row["QLIK Qty"],
-                    //     QlikDate: formatDate(row["Qlik Date"] || row["QLIK Date"]),
-                    //     DateState: "None",
-                    //     DateMsg: "",
-                    //     // These are the properties our validation logic uses!
-                    //     //Status 4
-                    // };
                     return {
                         // Level 1
                         VendorCode: row["Vendor Code"] || row["vendor code"],
@@ -486,7 +421,9 @@ sap.ui.define([
                         EmailFlag: row["Email Flag"] || row["EmailFlag"],   
                         EDIFlag: row["EDI Flag"] || row["EDIFlag"],    
                         QlikQty: row["Qlik Qty"] || row["QLIK Qty"],
-                        QlikDate: formatDate(row["Qlik Date"] || row["QLIK Date"])
+                        QlikDate: formatDate(row["Qlik Date"] || row["QLIK Date"]),
+                        Quantity: row["Quantity"],
+                        CreationDate:  formatDate(row["Conf. Date"]) || formatDate(row["Conf Delivery Date"]),
                     }
                 });
 
@@ -494,9 +431,12 @@ sap.ui.define([
                 const oValueHelpModel = new JSONModel(valueHelpData);
                 that.getOwnerComponent().setModel(oValueHelpModel, "valueHelpModel");
 
-                that.aOldData = JSON.parse(JSON.stringify(formattedData));  
 
-                that.getOwnerComponent().getModel("excelModel").setProperty("/data", formattedData);
+                let aDateNewData=that._processData(formattedData)
+
+                that.aOldData = JSON.parse(JSON.stringify(aDateNewData));  
+
+                that.getOwnerComponent().getModel("excelModel").setProperty("/data", aDateNewData);
 
                 // that._headerFB.setVisible(true)
                 MessageToast.show("Excel loaded for preview.");
@@ -507,37 +447,65 @@ sap.ui.define([
             reader.readAsBinaryString(file);
         },
          _processData: function (aData) {
-            aData.forEach(level1 => {
-                if (level1.children) {
-                    level1.children.forEach(level2 => {
-                        if (level2.children) {
-                            level2.children.forEach(level3 => {
-                                // 1. Get the dates
-                                const oDelDate = new Date(level3.DeliveryDate);
-                                const oCreDate = new Date(level3.CreationDate);
+            // Ensure aData is an array before processing
+            if (!Array.isArray(aData)) {
+                return aData;
+            }
+            var sortData=this.sortData(aData);
 
-                                // 2. Calculate the difference in time
-                                const iDiffInTime = oCreDate.getTime() - oDelDate.getTime();
-                                
-                                // 3. Convert time to days
-                                const iDiffInDays = iDiffInTime / (1000 * 3600 * 24);
+            sortData.forEach(row => {
+                // 1. Get the dates from the flat row object
+                const oDelDate = new Date(row.HarmanReqDate);
+                const oCreDate = new Date(row.CreationDate);
 
-                                // 4. Check logic: +- 5 days
-                                if (Math.abs(iDiffInDays) <= 5) {
-                                    level3.DateState = "Success"; // Green
-                                    level3.DateMsg = "Dates are within the allowed 5-day window";
-                                } else {
-                                    level3.DateState = "Error";   // Red
-                                    level3.DateMsg = "Dates fall outside the allowed 5-day window";
-                                }
-                            });
-                        }
-                    });
+                // Check if dates are valid to prevent NaN issues
+                if (!isNaN(oDelDate) && !isNaN(oCreDate)) {
+                    // 2. Calculate the difference in time
+                    const iDiffInTime = oCreDate.getTime() - oDelDate.getTime();
+                    
+                    // 3. Convert time to days
+                    const iDiffInDays = iDiffInTime / (1000 * 3600 * 24);
+
+                    // 4. Check logic: +- 5 days
+                    if (Math.abs(iDiffInDays) <= 5) {
+                        row.DateState = "Success"; // Green (ValueState.Success)
+                        row.DateMsg = "Dates are within the allowed 5-day window";
+                    } else {
+                        row.DateState = "Error";   // Red (ValueState.Error)
+                        row.DateMsg = "Dates fall outside the allowed 5-day window";
+                    }
+                } else {
+                    // Optional: Handle missing or invalid dates
+                    row.DateState = "None";
+                    row.DateMsg = "Invalid or missing date data";
                 }
             });
-            return aData;
+
+            
+
+            return sortData;
         },
-        onDownloadTemplate: function () {
+        sortData:function(aData){
+            if (!Array.isArray(aData)) {
+                return aData;
+            }
+            aData.sort((a, b) => {
+                // Sort by PONumber
+                if (a.PONumber !== b.PONumber) {
+                    return a.PONumber.localeCompare(b.PONumber, undefined, { numeric: true, sensitivity: 'base' });
+                }
+                
+                // If PONumber is the same, sort by Item
+                if (a.Item !== b.Item) {
+                    return a.Item.localeCompare(b.Item, undefined, { numeric: true, sensitivity: 'base' });
+                }
+                
+                // If Item is also the same, sort by SequenceNumber
+                return a.SequenceNumber.localeCompare(b.SequenceNumber, undefined, { numeric: true, sensitivity: 'base' });
+            });
+
+            return aData;
+
         },
         onSaveTemplate: async function (oEvent) {
     // 1. Fetch data directly from your master dataset array, ensuring all 19 rows are caught
@@ -545,8 +513,9 @@ sap.ui.define([
     var treeData = JSON.parse(JSON.stringify(this._oOriginalData || this.getView().getModel("excelModel").getProperty("/data")));
 
     var oCAPModel = this.getOwnerComponent().getModel("capService"); 
-    var oActionContext = oCAPModel.bindContext("/sendMailContent(...)");
+    var oActionContext = oCAPModel.bindContext("/sendEMailContent(...)"); 
     oActionContext.setParameter("poHeader", treeData);
+    MessageToast.show('Saving in progress...Please Wait');
 
     try {
         var oResults = await oActionContext.execute();
@@ -595,6 +564,8 @@ sap.ui.define([
             { label: 'EDI Flag', property: 'EDIFlag', type: 'string' },
             { label: 'Conf. Status', property: 'StatusFlag', type: 'string' },
             { label: 'Comment', property: 'RejectReason', type: 'string' },
+            { label: 'Quantity', property: 'Quantity', type: 'string' },
+            { label: 'Conf. Date', property: 'CreationDate', type: 'string' },
             
         ];
 
@@ -621,17 +592,17 @@ sap.ui.define([
 				actions: [MessageBox.Action.OK],
 				emphasizedAction: MessageBox.Action.OK,
 				onClose: function (sAction) {
-					MessageToast.show(sMsg);
-
+					MessageToast.show(sMsg);    
 
                     const resetNewRecFlag = (data) => {
-                        data.forEach(parent => {
-                            parent.children?.forEach(lineItem => {
-                                lineItem.children?.forEach(record => {
-                                    record.newRecFlag = false;
-                                });
-                            });
+                        if (!Array.isArray(data)) return data; // Safety check
+                        
+                        data.forEach(record => {
+                            if (record) {
+                                record.newRecFlag = false;
+                            }
                         });
+                        
                         return data;
                     };
                     var aOldExcelList= resetNewRecFlag(treeData);
@@ -646,73 +617,82 @@ sap.ui.define([
         onQuantityLiveChange: function (oEvent) {
             const oInput = oEvent.getSource();
             const sNewValue = oEvent.getParameter("newValue");
-            var sFixedValue = sNewValue.replace(/[^0-9]/g, "");
             
+            // 1. Force numeric inputs only
+            var sFixedValue = sNewValue.replace(/[^0-9]/g, "");
             if (sNewValue !== sFixedValue) {
                 oInput.setValue(sFixedValue);
             }
 
-            // 1. Get the Binding Context for the current line (Third Level)
             const oContext = oInput.getBindingContext("excelModel");
-            const sPath = oContext.getPath();
-
-            // 2. Identify the Parent Path (Second Level - PO Line Item)
-            // Example path: /0/children/1/children/2 -> Parent: /0/children/1
-            const aPathParts = sPath.split("/");
-            aPathParts.pop(); // Remove current index
-            aPathParts.pop(); // Remove "children" literal
-            const sParentPath = aPathParts.join("/");
+            if (!oContext) {
+                return;
+            }
 
             const oModel = oContext.getModel("excelModel");
-            const oParentData = oModel.getProperty(sParentPath);
+            const oCurrentItem = oContext.getObject();
+            
+            // Keys to identify matching line items
+            const sTargetPONumber = oCurrentItem.PONumber;
+            const sTargetItem = oCurrentItem.Item; 
+            const fPOQuantity = parseFloat(oCurrentItem.POQuantity || 0);
 
-            // 3. Get PO Quantity (Total allowed)
-            const fPOQuantity = parseFloat(oParentData.POQuantity || 0);
+            // 2. Get all rows from the flat array model data
+            // Assuming your data is bound directly to the root "/" of the model
+            const aAllItems = oModel.getProperty("/data") || [];
 
-            // 4. Calculate sum of all AB lines under this parent
-            const aConfirmations = oParentData.children || [];
+            // 3. Calculate sum of 'Quantity' for all items sharing same PO and Item
             let fTotalConfirmedQty = 0;
 
-            aConfirmations.forEach((item, index) => {
-                // Use the live value for the row being edited, otherwise use the model value
-                if (oContext.getPath() === sParentPath + "/children/" + index) {
-                    fTotalConfirmedQty += parseFloat(sNewValue || 0);
-                } else {
-                    // Only sum items with Category "AB"
-                    if (item.ConfirmationCategory === "AB") {
+            aAllItems.forEach((item) => {
+                // Match items with the exact same PO Number and Line Item
+                if (item.PONumber === sTargetPONumber && item.Item === sTargetItem) {
+                    
+                    // Check if this is the exact row currently being edited
+                    // (We compare the object references to find the active editing line)
+                    if (item === oCurrentItem) {
+                        fTotalConfirmedQty += parseFloat(sFixedValue || 0);
+                    } else {
                         fTotalConfirmedQty += parseFloat(item.Quantity || 0);
                     }
                 }
             });
 
-            // 5. Validation Check
-            if (fTotalConfirmedQty > fPOQuantity) {
-                oInput.setValueState("Error");
-                oInput.setValueStateText("The sum of Confirmation quantity exceeds the PO line quantity");
-            } else {
-                oInput.setValueState("None");
-                oInput.setValueStateText("");
-                const oTable = oEvent.getSource().getParent().getParent() // Ensure you have the ID of your TreeTable
-                const aRows = oTable.getRows();
+            // 4. Validation Check
+            const bIsOverLimit = fTotalConfirmedQty > fPOQuantity;
+            const sState = bIsOverLimit ? "Error" : "None";
+            const sMessage = bIsOverLimit ? "The sum of Confirmation quantity exceeds the PO line quantity" : "";
 
-                aRows.forEach(oRow => {
-                    const oRowContext = oRow.getBindingContext("excelModel");
-                    if (oRowContext) {
-                        const sRowPath = oRowContext.getPath();
+            // 5. Update UI state across the visible rows
+            // Instead of querying table rows via hardcoded cell indices, we find matching contexts.
+            const oTable = oInput.getParent().getParent(); // Adjust if table is deeper nested
+            const aRows = oTable.getRows ? oTable.getRows() : [];
 
-                        // Check if this row belongs to the same parent PO Line
-                        if (sRowPath.startsWith(sParentPath + "/children/")) {
-                            // Find the Input control within the row (usually inside a template/cell)
-                            // Adjust the index [n] based on which column your Quantity input is in
-                            const oRowInput = oRow.getCells()[1];
-                            // const oRowInput = oRow.getCells().find(oCell => oCell.getMetadata().getName() === "sap.m.Input");
-                            oRowInput.setValueState("None");
-                            oRowInput.setValueStateText("");
+            aRows.forEach(oRow => {
+                const oRowContext = oRow.getBindingContext("excelModel");
+                if (oRowContext) {
+                    const oRowData = oRowContext.getObject();
+                    
+                    // If the rendered row belongs to the same PO item group, sync its error state
+                    if (oRowData.PONumber === sTargetPONumber && oRowData.Item === sTargetItem) {
+                        // Safely search for the Input control inside this row's cells
+                        const oQuantityInput = oRow.getCells().find(oCell => {
+                            if (oCell.getMetadata().getName() === "sap.m.Input") {
+                                const oBinding = oCell.getBinding("value");
+                                // Check if this input is bound to the 'Quantity' property in your model
+                                return oBinding && oBinding.getPath() === "Quantity";
+                            }
+                            return false;
+                        });
+
+                        // Apply the validation state to the correct input field
+                        if (oQuantityInput) {
+                            oQuantityInput.setValueState(sState);
+                            oQuantityInput.setValueStateText(sMessage);
                         }
                     }
-                });
-
-            }
+                }
+            });
         },
         onDateLiveChange: function (oEvent) {
             const oDP = oEvent.getSource();
@@ -725,7 +705,7 @@ sap.ui.define([
             // 1. Navigate to Parent Delivery Date
             const sPath = oContext.getPath();
             // const sParentPath = sPath.substring(0, sPath.lastIndexOf("/children/"));
-            const sParentDateStr = oModel.getProperty(sPath + "/DeliveryDate");
+            const sParentDateStr = oModel.getProperty(sPath + "/HarmanReqDate");
 
             const dParent = new Date(sParentDateStr);
             const dChild = new Date(sNewDateValue);
@@ -766,35 +746,6 @@ sap.ui.define([
         convertSubLIFlag: function (bFlag) {
             this.sublineItemFlag = bFlag
         },
-        onSubShowExpanded:function(oEvent){
-            if(this.sublineItemFlag){
-                this.convertLIFlag(false)
-                let oSource=oEvent.getSource()
-                let oBindingContext=oSource.getBindingContext("excelModel")
-                let oPath=oBindingContext.getPath()
-                let oPanelVisiblePath=oPath+"/NextPanelVisible"
-
-                let bVisiblePath=this.getOwnerComponent().getModel("excelModel").getProperty(oPanelVisiblePath)
-                if(bVisiblePath){
-                    this.getOwnerComponent().getModel("excelModel").setProperty(oPanelVisiblePath,false)
-                }else{
-                this.getOwnerComponent().getModel("excelModel").setProperty(oPanelVisiblePath,true)
-                }
-
-                var oCurrentItem = oEvent.getSource();
-
-                // 2. Manage the highlight logic
-                if (this.prevRecord) {
-                    this.prevRecord.removeStyleClass("myCustomHighlight");
-                }
-                
-                oCurrentItem.addStyleClass("myCustomHighlight");
-                
-                // 3. Store this item as the "previous" for the next time a row is pressed
-                this.prevRecord = oCurrentItem;
-            }
-            this.convertSubLIFlag(true)
-        },
         onAddVendorRowSP: function (oEvent) {
             this.convertLIFlag(false);
             this.convertSubLIFlag(false);
@@ -818,7 +769,7 @@ sap.ui.define([
             const maxSequence = oFConfTable.length > 0 ? Math.max(...oFConfTable) : 0;
             console.log(`Max Sequence Number for Item ${sTargetItem}:`, maxSequence);
 
-            const iNewSNum = (maxSequence + 1).toString();
+            const iNewSNum = (maxSequence + 1).toString();  
 
             // 2. Build the new row object
             var oPushConfItem = {
@@ -852,12 +803,12 @@ sap.ui.define([
                 RemarkCustomerAPAC: oVendorObject.RemarkCustomerAPAC,
                 HarmanReqDate: oVendorObject.HarmanReqDate,
                 ODMFeedback: oVendorObject.ODMFeedback,
-                Item: oVendorObject.Item,
+                Item: oVendorObject.Item,  
                 SequenceNumber: iNewSNum,
-                StatusFlag: oVendorObject.StatusFlag,
-                RejectReason: oVendorObject.RejectReason,
-                ActionDate: oVendorObject.ActionDate,
-                EmailFlag: oVendorObject.EmailFlag,   
+                StatusFlag: "",
+                RejectReason: "",
+                ActionDate: "",
+                EmailFlag: "",   
                 EDIFlag: oVendorObject.EDIFlag,  
                 QlikQty: oVendorObject.QlikQty,
                 QlikDate: oVendorObject.QlikDate,
@@ -880,7 +831,9 @@ sap.ui.define([
             }
 
             // 3. CRITICAL: Update model property path correctly and refresh the model
-            oModel.setProperty('/data', oPOConfTable);
+
+            var oSortConfTable= this.sortData(oPOConfTable);
+            oModel.setProperty('/data', oSortConfTable);
             oModel.refresh(true); // Forces UI components bound to this model to re-render
         },
         onDeleteVendorTreeRow: function (oEvent) {

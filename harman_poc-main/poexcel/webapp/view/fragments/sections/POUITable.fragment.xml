@@ -16,7 +16,6 @@
             <m:OverflowToolbar style="Clear">
                 <m:Title text="Purchase Orders, Items &amp; Confirmations Grid" level="H5"/>
                 <m:ToolbarSpacer/>
-                <!-- <m:Button icon="sap-icon://add" type="Emphasized" tooltip="Add Row" press=".onAddVendorRowSP"/> -->
             </m:OverflowToolbar>
         </extension>
 
@@ -99,17 +98,37 @@
                 </template>
             </Column>
 
-            <Column width="8rem" hAlign="Center" sortProperty="PODate" filterProperty="PODate">
-                <m:Label text="PO Date" tooltip="PO Date"/>
+            <Column width="4rem" hAlign="Center" sortProperty="Item" filterProperty="Item">
+                <m:Label text="Conf. Item" tooltip="Confirmation Item"/>
                 <template>
-                    <m:Text text="{path: 'excelModel>PODate', formatter: '.formatter.formatDate'}" wrapping="false"/>
+                    <m:Text text="{excelModel>Item}" wrapping="false"/>
                 </template>
             </Column>
-
             <Column width="4rem" hAlign="Center" sortProperty="SequenceNumber" filterProperty="SequenceNumber">
                 <m:Label text="SN" tooltip="Sequence Number"/>
                 <template>
                     <m:Text text="{excelModel>SequenceNumber}" wrapping="false"/>
+                </template>
+            </Column>
+
+            <Column width="6rem" hAlign="End" sortProperty="POQuantity" filterProperty="POQuantity">
+                <m:Label text="PO Qty" tooltip="Purchase Order Quantity"/>
+                <template>
+                    <m:Text text="{excelModel>POQuantity}" wrapping="false"/>
+                </template>
+            </Column>
+
+            <Column width="12rem" hAlign="Center" sortProperty="HarmanReqDate" filterProperty="HarmanReqDate">
+                <m:Label text="Harman request Jun 7th" tooltip="Harman request Jun 7th"/>
+                <template>
+                    <m:Text text="{excelModel>HarmanReqDate}" wrapping="false"/>
+                </template>
+            </Column>
+
+            <Column width="8rem" hAlign="Center" sortProperty="PODate" filterProperty="PODate">
+                <m:Label text="PO Date" tooltip="PO Date"/>
+                <template>
+                    <m:Text text="{path: 'excelModel>PODate', formatter: '.formatter.formatDate'}" wrapping="false"/>
                 </template>
             </Column>
 
@@ -197,12 +216,7 @@
                 </template>
             </Column>
 
-            <Column width="12rem" hAlign="Center" sortProperty="HarmanReqDate" filterProperty="HarmanReqDate">
-                <m:Label text="Harman request Jun 7th" tooltip="Harman request Jun 7th"/>
-                <template>
-                    <m:Text text="{excelModel>HarmanReqDate}" wrapping="false"/>
-                </template>
-            </Column>
+            
 
             <Column width="12rem" hAlign="Center" sortProperty="ODMFeedback" filterProperty="ODMFeedback">
                 <m:Label text="ODM feedback Jun 10th" tooltip="ODM feedback Jun 10th"/>
@@ -225,21 +239,6 @@
                 </template>
             </Column>
 
-
-
-            <Column width="7rem" hAlign="Center" sortProperty="DeliveryDate" filterProperty="DeliveryDate">
-                <m:Label text="Deliv. Date" tooltip="Delivery Date"/>
-                <template>
-                    <m:Text text="{path: 'excelModel>DeliveryDate', formatter: '.formatter.formatDate'}" wrapping="false"/>
-                </template>
-            </Column>
-
-            <Column width="6rem" hAlign="End" sortProperty="POQuantity" filterProperty="POQuantity">
-                <m:Label text="PO Qty" tooltip="Purchase Order Quantity"/>
-                <template>
-                    <m:Text text="{excelModel>POQuantity}" wrapping="false"/>
-                </template>
-            </Column>
 
             <Column width="8rem" sortProperty="Material" filterProperty="Material">
                 <m:Label text="Material" tooltip="Material"/>
@@ -269,12 +268,7 @@
                 </template>
             </Column>
 
-            <Column width="4rem" hAlign="Center" sortProperty="Item" filterProperty="Item">
-                <m:Label text="Conf. Item" tooltip="Confirmation Item"/>
-                <template>
-                    <m:Text text="{excelModel>Item}" wrapping="false"/>
-                </template>
-            </Column>
+            
         </columns>
     </Table>
 </core:FragmentDefinition>

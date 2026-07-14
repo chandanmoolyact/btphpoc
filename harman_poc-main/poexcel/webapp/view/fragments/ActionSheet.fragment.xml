@@ -7,7 +7,7 @@
 	placement="Right">
 	<Button text="Delete" tooltip="Delete"
 		icon="sap-icon://delete" type="Reject" press=".onDeleteVendorTreeRow"
-                            enabled="{= ${excelModel>ConfirmationCategory} === 'LA' || ${excelModel>StatusFlag} === 'R' ? false : true }" class="poActionBtn"/>
+                            enabled="{= ${excelModel>ConfirmationCategory} === 'LA' || ${excelModel>StatusFlag} === 'R'|| ${excelModel>newRecFlag} === 'false'||!${excelModel>newRecFlag}? false : true }" class="poActionBtn"/>
 	<Button text="Accept" type="Accept" tooltip="Accept" icon="sap-icon://accept" press=".onAcceptVendorTreeRow"
                             enabled="{= ${excelModel>ConfirmationCategory} === 'LA' || ${excelModel>StatusFlag} === 'A' || ${excelModel>EDIFlag} !== 'E' ? false : true }" class="poActionBtn"/>
 	<Button text="Reject" type="Reject" tooltip="Reject" icon="sap-icon://decline" press=".onRejectVendorTreeRow"

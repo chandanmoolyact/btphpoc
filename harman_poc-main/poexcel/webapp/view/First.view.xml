@@ -137,12 +137,12 @@
 										</Input>
 									</fb:control>
 								</fb:FilterGroupItem>
-								<fb:FilterGroupItem name="DeliveryDate" label="Delivery Date Range" groupName="Group1" visibleInFilterBar="true">
+								<fb:FilterGroupItem name="HarmanReqDate" label="Delivery Date Range" groupName="Group1" visibleInFilterBar="true">
 									<fb:control>
 										<DateRangeSelection
 											placeholder="Select Delivery Date Range"
 											id="idDelDateRange"
-											change=".handleDateRangeChange"/>
+											change=".handleDateRangeChange"/> 
 									</fb:control>
 								</fb:FilterGroupItem>
 								<fb:FilterGroupItem name="EDIFlag" label="EDI Data" groupName="Group1" visibleInFilterBar="true">
